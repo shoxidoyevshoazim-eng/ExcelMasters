@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Excel Masters — 0-Daraja Kursi & Formula Trenajori (MVP)</title>
+  <meta name="description" content="Excel Masters platformasi: 20 soniyalik diagnostika orqali darajangizni aniqlang, 0-daraja darslarini o'rganing va interaktiv Excel formula trenajorida amaliyot qiling.">
+
+  <!-- Google Fonts: Outfit & Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/course.css">
+  <link rel="stylesheet" href="css/trainer.css">
+</head>
+<body>
+
+  <!-- ==========================================================================
+       Header / Navbar
+       ========================================================================== -->
+  <header class="header-navbar">
+    <div class="nav-container">
+      <div class="brand-logo" id="nav-brand-logo">
+        <div class="brand-icon-box">
+          <i class="fa-solid fa-file-excel"></i>
+        </div>
+        <div class="brand-name">Excel<span>Masters</span></div>
+        <span class="brand-tag">0-DARAJA MVP</span>
+      </div>
+
+      <nav class="nav-center-menu">
+        <button class="nav-tab-btn active" data-view="hero-view" id="nav-btn-home">
+          <i class="fa-solid fa-house"></i> Bosh sahifa
+        </button>
+        <button class="nav-tab-btn" data-view="diagnostic-view" id="nav-btn-diagnostic">
+          <i class="fa-solid fa-list-check"></i> Diagnostika Testi
+        </button>
+        <button class="nav-tab-btn" data-view="course-view" id="nav-btn-course">
+          <i class="fa-solid fa-graduation-cap"></i> 0-Daraja Kursi
+        </button>
+        <button class="nav-tab-btn" data-view="trainer-view" id="nav-btn-trainer">
+          <i class="fa-solid fa-calculator"></i> Formula Trenajori
+        </button>
+      </nav>
+
+      <div class="nav-right-actions">
+        <button class="user-badge-btn" id="user-profile-btn">
+          <div class="user-avatar" id="nav-user-avatar">EM</div>
+          <span id="nav-user-name">Mehmon</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==========================================================================
+       Asosiy Kontent Maydoni (Main Content View Switcher)
+       ========================================================================== -->
+  <main class="main-content-view">
+
+    <!-- 1. Bosh Sahifa / Landing View -->
+    <section class="view-section active" id="hero-view">
+      <div class="hero-wrapper">
+        <div class="hero-pill-badge">
+          <i class="fa-solid fa-bolt"></i> Noldan Professionalgacha Bo'lgan Yo'l
+        </div>
+        <h1 class="hero-title">
+          Excel Bilimingizni <span class="gradient-text">Diagnostika Qiling</span> va Trenajorda Sinang
+        </h1>
+        <p class="hero-subtitle">
+          20 soniyalik tezkor test orqali darajangizni aniqlang, 0-daraja poydevorini mustahkamlang va haqiqiy formulalar simulyatorida amaliy checkpointdan o'ting!
+        </p>
+
+        <div class="hero-cta-group">
+          <button class="btn btn-primary btn-lg btn-glow" id="hero-start-diag-btn">
+            <i class="fa-solid fa-play"></i> Diagnostikani Boshlash (~20 soniya)
+          </button>
+          <button class="btn btn-secondary btn-lg" id="hero-direct-course-btn">
+            <i class="fa-solid fa-book-open"></i> 0-Daraja Kursiga O'tish
+          </button>
+        </div>
+
+        <!-- Features Showcase -->
+        <div class="hero-features-grid">
+          <div class="feature-glass-card">
+            <div class="feature-icon-wrapper">
+              <i class="fa-solid fa-chart-pie"></i>
+            </div>
+            <h3>1. Aniq Diagnostika</h3>
+            <p>3-4 ta tap-savol orqali bilimingizni tahlil qilamiz va sizga mos o'quv rejasini tavsiya etamiz.</p>
+          </div>
+
+          <div class="feature-glass-card">
+            <div class="feature-icon-wrapper blue">
+              <i class="fa-solid fa-laptop-code"></i>
+            </div>
+            <h3>2. 0-Daraja LMS Kursi</h3>
+            <p>Excel interfeysi, ma'lumot turlari, nisbiy/absolyut manzillar ($) va asosiy formulalar bo'yicha chuqur darslar.</p>
+          </div>
+
+          <div class="feature-glass-card">
+            <div class="feature-icon-wrapper gold">
+              <i class="fa-solid fa-square-root-variable"></i>
+            </div>
+            <h3>3. Formula Trenajori</h3>
+            <p>Haqiqiy Excel grid simulyatorida SUM, AVERAGE, COUNT, MAX, MIN va $ qulflash formulalarini yozib tekshiring.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. Diagnostika (Placement) Test View -->
+    <section class="view-section" id="diagnostic-view">
+      <div class="diagnostic-container">
+        <div class="diagnostic-card" id="diagnostic-card">
+          <!-- Step Info & Progress -->
+          <div class="diag-header">
+            <div class="diag-step-info">
+              <span id="diag-step-label">1-Savol (Jami 4 ta)</span>
+              <span id="diag-time-estimate"><i class="fa-regular fa-clock"></i> ~20 soniya</span>
+            </div>
+            <div class="diag-progress-bar-bg">
+              <div class="diag-progress-fill" id="diag-progress-bar"></div>
+            </div>
+          </div>
+
+          <!-- Dynamic Question Area -->
+          <div id="diag-question-container">
+            <!-- JS orqali to'ldiriladi -->
+          </div>
+
+          <!-- Diagnostic Result View (Hidden Initially) -->
+          <div id="diag-result-container" style="display: none;">
+            <div class="diag-result-card">
+              <div class="diag-result-badge">
+                <i class="fa-solid fa-award"></i>
+              </div>
+              <h2 class="diag-result-level" id="diag-result-level-title">0-Daraja (Boshlang'ich)</h2>
+              <p class="diag-result-desc" id="diag-result-level-desc">
+                Siz uchun Excelning mustahkam poydevorini yaratish, kataklar bilan to'g'ri ishlash va ilk formulalarni o'rganish juda mos keladi.
+              </p>
+              <button class="btn btn-primary btn-lg btn-glow" id="diag-continue-to-course-btn">
+                <i class="fa-solid fa-arrow-right"></i> 0-Daraja Kursini Boshlash
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. 0-Daraja Kursi (LMS) View -->
+    <section class="view-section" id="course-view">
+      <div class="course-layout">
+        <!-- Sidebar Checklist -->
+        <aside class="course-sidebar">
+          <div class="sidebar-header">
+            <div class="sidebar-title">
+              <i class="fa-solid fa-graduation-cap"></i> 0-Daraja Darslari
+            </div>
+            <div class="course-progress-meta">
+              <span>Progress:</span>
+              <span id="course-progress-text">0/8 Tugallandi (0%)</span>
+            </div>
+            <div class="course-progress-bar">
+              <div class="course-progress-fill" id="course-progress-bar-fill"></div>
+            </div>
+          </div>
+
+          <!-- Lessons List -->
+          <div class="lessons-list" id="sidebar-lessons-list">
+            <!-- JS orqali render bo'ladi -->
+          </div>
+
+          <!-- Sidebar Checkpoint CTA -->
+          <div class="sidebar-checkpoint-btn">
+            <button class="btn btn-secondary btn-sm" id="sidebar-go-trainer-btn" style="width: 100%;">
+              <i class="fa-solid fa-calculator"></i> Formula Trenajoriga O'tish
+            </button>
+          </div>
+        </aside>
+
+        <!-- Main Lesson Content Area -->
+        <article class="lesson-main-wrapper" id="lesson-main-wrapper">
+          <div class="lesson-badge-header">
+            <span class="module-pill" id="lesson-module-pill">1-Modul: Asoslar</span>
+            <span class="duration-pill" id="lesson-duration-pill">
+              <i class="fa-regular fa-clock"></i> 10 daqiqa
+            </span>
+          </div>
+
+          <h1 class="lesson-heading" id="lesson-title-heading">
+            Excel Interfeysi: Lenta, Kataklar va Varaqlar
+          </h1>
+
+          <div class="lesson-summary-box" id="lesson-summary-box">
+            Darsning qisqacha mazmuni bu yerda chiqadi.
+          </div>
+
+          <!-- Video / Interaktiv Mockup Box -->
+          <div class="lesson-video-box">
+            <div class="video-play-icon" id="video-play-trigger">
+              <i class="fa-solid fa-play"></i>
+            </div>
+            <div class="video-box-title" id="video-box-title">Interaktiv Video / Amaliy Tushuntirish</div>
+            <div class="video-tag">Excel Masters HD Video Darslik</div>
+          </div>
+
+          <!-- Lesson Rich Content Body -->
+          <div class="lesson-article-body" id="lesson-content-body">
+            <!-- Dars matni va amaliy qo'llanmalar JS orqali joylanadi -->
+          </div>
+
+          <!-- Lesson Mini-Quiz Section -->
+          <section class="lesson-quiz-section">
+            <div class="quiz-box">
+              <div class="quiz-header">
+                <i class="fa-solid fa-circle-question"></i> Mini-Tekshiruv (Keyingi darsni ochish sharti)
+              </div>
+              <div class="quiz-question-title" id="lesson-quiz-question">
+                Katakcha qanday nomlanadi?
+              </div>
+              <div class="quiz-options-list" id="lesson-quiz-options">
+                <!-- Variantlar JS orqali chiqadi -->
+              </div>
+              <div class="quiz-feedback-box" id="lesson-quiz-feedback">
+                <!-- Feedback xabari -->
+              </div>
+            </div>
+          </section>
+
+          <!-- Lesson Navigation Footer -->
+          <div class="lesson-footer-nav">
+            <button class="btn btn-secondary btn-sm" id="prev-lesson-btn" disabled>
+              <i class="fa-solid fa-arrow-left"></i> Oldingi dars
+            </button>
+            <button class="btn btn-primary btn-sm" id="next-lesson-btn" disabled>
+              Keyingi dars <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- 4. Formula Trenajori (Checkpoint Excel Simulyator) View -->
+    <section class="view-section" id="trainer-view">
+      <div class="trainer-wrapper">
+        <!-- Top Challenge Banner -->
+        <div class="trainer-header-card">
+          <div class="trainer-header-top">
+            <div class="trainer-checkpoint-tag">
+              <i class="fa-solid fa-award"></i> 0-DARAJA CHECKPOINT TRENAJORI
+            </div>
+            <div class="trainer-score-badge" id="trainer-progress-badge">
+              Vazifa: 1 / 6
+            </div>
+          </div>
+
+          <div class="task-instruction-box">
+            <div class="task-title" id="trainer-task-title">1-Vazifa: Jami Maoshlar Yig'indisi</div>
+            <div class="task-instruction-text" id="trainer-task-instruction">
+              Kompaniya xodimlarining umumiy maosh miqdorini hisoblang.
+            </div>
+            <div class="task-hint-text">
+              <i class="fa-regular fa-lightbulb"></i> <span id="trainer-task-hint">Maslahat: =СУММ(B2:B6) yoki =SUM(B2:B6)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Excel Simulyatori Oynasi -->
+        <div class="excel-simulator-window">
+          <!-- Excel Window Header -->
+          <div class="excel-window-header">
+            <div class="excel-window-title">
+              <i class="fa-solid fa-file-excel"></i> Excel Masters Workbook.xlsx — [Formula Simulyatori]
+            </div>
+            <div class="excel-ribbon-tabs">
+              <span class="excel-ribbon-tab active">Главная (Home)</span>
+              <span class="excel-ribbon-tab">Вставка (Insert)</span>
+              <span class="excel-ribbon-tab">Формулы (Formulas)</span>
+              <span class="excel-ribbon-tab">Данные (Data)</span>
+            </div>
+          </div>
+
+          <!-- Formula Bar (fx) -->
+          <div class="excel-formula-bar-container">
+            <div class="excel-name-box" id="excel-active-cell-name">B7</div>
+            <div class="excel-fx-icon">fx</div>
+            <input type="text" 
+                   class="excel-formula-input" 
+                   id="excel-formula-input" 
+                   placeholder="Formula kiriting (masalan: =СУММ(B2:B6) yoki =SUM(B2:B6))" 
+                   autocomplete="off" 
+                   spellcheck="false">
+            <button class="excel-submit-btn" id="excel-formula-submit-btn">
+              <i class="fa-solid fa-check"></i> Tekshirish
+            </button>
+          </div>
+
+          <!-- Kataklar Jadvali (Grid) -->
+          <div class="excel-grid-viewport">
+            <table class="excel-grid-table" id="excel-grid-table">
+              <!-- JS orqali dinamik chiziladi -->
+            </table>
+          </div>
+        </div>
+
+        <!-- Feedback Alert Banner -->
+        <div class="trainer-feedback-alert" id="trainer-feedback-alert">
+          <div id="trainer-feedback-message">Natija xabari...</div>
+          <button class="btn btn-primary btn-sm" id="trainer-next-task-btn" style="display: none;">
+            Keyingi vazifa <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ==========================================================================
+       Modals (Lead Capture & Checkpoint Sertifikat)
+       ========================================================================== -->
+  
+  <!-- Foydalanuvchi Ro'yxatdan O'tish / Profil Modali -->
+  <div class="modal-backdrop" id="user-modal">
+    <div class="modal-box">
+      <button class="modal-close-btn" id="user-modal-close">&times;</button>
+      <h3 class="modal-title">Foydalanuvchi Profili</h3>
+      <p class="modal-subtitle">Natijalaringiz va progressni saqlash uchun ma'lumotlaringizni kiriting:</p>
+
+      <form id="user-profile-form">
+        <div class="form-group">
+          <label class="form-label" for="input-user-name">Ismingiz:</label>
+          <input type="text" class="form-input" id="input-user-name" placeholder="Masalan: Jasur Aliyev" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="input-user-contact">Telefon yoki Email:</label>
+          <input type="text" class="form-input" id="input-user-contact" placeholder="+998 90 123 45 67" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-glow" style="width: 100%; margin-top: 0.5rem;">
+          <i class="fa-solid fa-floppy-disk"></i> Saqlash va Davom etish
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Checkpoint Yakunlash / G'alaba Modali -->
+  <div class="modal-backdrop" id="congrats-modal">
+    <div class="modal-box checkpoint-congrats-modal">
+      <button class="modal-close-btn" id="congrats-modal-close">&times;</button>
+      <div class="congrats-icon-box">
+        <i class="fa-solid fa-trophy"></i>
+      </div>
+      <h2 class="congrats-title">Tabriklaymiz!</h2>
+      <div class="congrats-score-pill" id="congrats-score-pill">
+        Natija: 6/6 to'g'ri (100%)
+      </div>
+      <p style="color: var(--text-secondary); margin-bottom: 1.75rem; font-size: 0.95rem;">
+        Siz 0-Daraja Checkpoint sinovidan a'lo darajada o'tdingiz va Excel asoslarini to'liq o'zlashtirdingiz!
+      </p>
+      <div style="display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
+        <button class="btn btn-secondary" id="congrats-retry-btn">
+          <i class="fa-solid fa-rotate-right"></i> Qayta Mashq Qilish
+        </button>
+        <button class="btn btn-primary btn-glow" id="congrats-pro-btn">
+          <i class="fa-solid fa-lock-open"></i> Pro Darajaga Ruxsat Olish
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript Modules -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

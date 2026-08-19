@@ -1,0 +1,498 @@
+/* ==========================================================================
+   Excel Masters MVP - Kurs LMS (0-Daraja Darslar Paneli) Uslublari
+   ========================================================================== */
+
+.course-layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 2rem;
+  align-items: start;
+  margin-top: 1rem;
+}
+
+/* Sidebar darslar ro'yxati */
+.course-sidebar {
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-xl);
+  padding: 1.5rem;
+  position: sticky;
+  top: 90px;
+  max-height: calc(100vh - 110px);
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-header {
+  margin-bottom: 1.25rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.sidebar-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.course-progress-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.4rem;
+  font-weight: 600;
+}
+
+.course-progress-bar {
+  width: 100%;
+  height: 6px;
+  background: var(--bg-elevated);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+}
+
+.course-progress-fill {
+  height: 100%;
+  width: 12.5%;
+  background: linear-gradient(90deg, #10B981, #34D399);
+  border-radius: var(--radius-pill);
+  transition: width 0.3s ease;
+}
+
+.lessons-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+/* Scrollbar */
+.lessons-list::-webkit-scrollbar {
+  width: 5px;
+}
+.lessons-list::-webkit-scrollbar-thumb {
+  background: var(--bg-elevated);
+  border-radius: 4px;
+}
+
+.lesson-item-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  padding: 0.75rem 0.85rem;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--text-secondary);
+  font-family: inherit;
+  transition: var(--transition-fast);
+  width: 100%;
+}
+
+.lesson-item-btn:hover:not(.locked) {
+  background: var(--bg-card-hover);
+  color: var(--text-primary);
+}
+
+.lesson-item-btn.active {
+  background: var(--bg-elevated);
+  border-color: var(--color-primary);
+  color: var(--color-primary-light);
+  font-weight: 600;
+}
+
+.lesson-item-btn.completed .lesson-status-icon {
+  color: var(--color-primary);
+}
+
+.lesson-item-btn.locked {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.lesson-status-icon {
+  font-size: 0.95rem;
+  min-width: 20px;
+  text-align: center;
+}
+
+.lesson-item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.lesson-item-title {
+  font-size: 0.85rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lesson-item-meta {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.sidebar-checkpoint-btn {
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-subtle);
+}
+
+/* ==========================================================================
+   Asosiy Dars Kontenti (Main Lesson Container)
+   ========================================================================== */
+.lesson-main-wrapper {
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-xl);
+  padding: 2.5rem;
+  box-shadow: var(--shadow-md);
+}
+
+.lesson-badge-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.module-pill {
+  font-size: 0.75rem;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  background: rgba(59, 130, 246, 0.15);
+  color: #60A5FA;
+  font-weight: 600;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.duration-pill {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.lesson-heading {
+  font-size: 1.85rem;
+  font-weight: 800;
+  line-height: 1.25;
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+}
+
+.lesson-summary-box {
+  background: var(--bg-elevated);
+  border-left: 4px solid var(--color-primary);
+  border-radius: var(--radius-sm);
+  padding: 1rem 1.25rem;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin-bottom: 2rem;
+}
+
+/* Video Placeholder / Interaktiv Visual Box */
+.lesson-video-box {
+  background: linear-gradient(135deg, #0f172a, #1e1b4b);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-lg);
+  aspect-ratio: 16 / 9;
+  max-height: 380px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 2.5rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.video-play-icon {
+  width: 64px;
+  height: 64px;
+  background: rgba(16, 185, 129, 0.9);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.5rem;
+  box-shadow: 0 0 30px var(--color-primary-glow);
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.video-play-icon:hover {
+  transform: scale(1.1);
+}
+
+.video-box-title {
+  margin-top: 1rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.video-tag {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 0.2rem;
+}
+
+/* Matn va Tarkib bloklari */
+.lesson-article-body {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  line-height: 1.8;
+}
+
+.lesson-article-body h3 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 1.75rem 0 0.75rem;
+}
+
+.lesson-article-body p {
+  margin-bottom: 1.25rem;
+}
+
+.content-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.25rem;
+  margin: 1.5rem 0;
+}
+
+.info-card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+}
+
+.info-card-header {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.info-card-header i {
+  color: var(--color-primary-light);
+}
+
+.tip-box {
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin: 1.75rem 0;
+  color: #D1FAE5;
+  font-size: 0.95rem;
+}
+
+.tip-box i {
+  color: var(--color-primary-light);
+  font-size: 1.25rem;
+  margin-top: 3px;
+}
+
+.warning-box {
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin: 1.75rem 0;
+  color: #FEE2E2;
+  font-size: 0.95rem;
+}
+
+.warning-box i {
+  color: var(--color-danger);
+  font-size: 1.25rem;
+  margin-top: 3px;
+}
+
+/* Jadvallar */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  background: var(--bg-elevated);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.data-table th, .data-table td {
+  padding: 0.85rem 1.25rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: 0.9rem;
+}
+
+.data-table th {
+  background: rgba(0, 0, 0, 0.3);
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+kbd {
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--color-primary-light);
+  box-shadow: 0 2px 0 rgba(0,0,0,0.5);
+}
+
+code {
+  font-family: var(--font-mono);
+  background: rgba(0, 0, 0, 0.35);
+  color: var(--color-primary-light);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+/* ==========================================================================
+   Dars ichidagi Mini-Quiz (Checkpoint)
+   ========================================================================== */
+.lesson-quiz-section {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 2px dashed var(--border-subtle);
+}
+
+.quiz-box {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+}
+
+.quiz-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--color-gold);
+  font-weight: 700;
+  font-size: 0.95rem;
+  margin-bottom: 0.75rem;
+}
+
+.quiz-question-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 1.5rem;
+}
+
+.quiz-options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.quiz-opt-btn {
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.25rem;
+  text-align: left;
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.quiz-opt-btn:hover:not(:disabled) {
+  border-color: var(--color-primary);
+  background: var(--bg-card-hover);
+}
+
+.quiz-opt-btn.correct {
+  background: rgba(16, 185, 129, 0.15);
+  border-color: var(--color-primary);
+  color: #34D399;
+  font-weight: 600;
+}
+
+.quiz-opt-btn.wrong {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: var(--color-danger);
+  color: #F87171;
+}
+
+.quiz-feedback-box {
+  margin-top: 1.25rem;
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  display: none;
+}
+
+.quiz-feedback-box.show {
+  display: block;
+  animation: fadeIn 0.3s ease;
+}
+
+.quiz-feedback-box.success {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid var(--color-primary);
+  color: #D1FAE5;
+}
+
+.quiz-feedback-box.error {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid var(--color-danger);
+  color: #FEE2E2;
+}
+
+.lesson-footer-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-card);
+}
+
+@media (max-width: 900px) {
+  .course-layout {
+    grid-template-columns: 1fr;
+  }
+  .course-sidebar {
+    position: static;
+    max-height: none;
+  }
+  .lesson-main-wrapper {
+    padding: 1.5rem;
+  }
+}

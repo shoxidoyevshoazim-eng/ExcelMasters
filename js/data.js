@@ -3,100 +3,480 @@
  * Diagnostika savollari, 0-Daraja darslari va Formula trenajori topshiriqlari
  */
 
+export const COURSES_DATA = {
+  boshlangich: {
+    id: "boshlangich",
+    title: "Excel Boshlang'ich",
+    subtitle: "Poydevor va Asosiy Konsepsiyalar",
+    badge: "Noldan Boshlovchilar Uchun",
+    description: "Excel interfeysi, kataklar bilan ishlash, nisbiy va absolyut manzillar ($) hamda asosiy formulalar (SUM, AVERAGE, COUNT, MAX, MIN).",
+    lessons: [
+      {
+        id: 1,
+        title: "Excel Interfeysi: Lenta, Kataklar va Varaqlar",
+        duration: "10 daqiqa",
+        module: "1-Modul: Asoslar",
+        summary: "Excel ishchi maydoni, lenta (Ribbon), kataklar koordinatasi va varaqlarni (Sheets) boshqarish.",
+        videoPlaceholder: "Excel Interfeysi Bilan Tanishish",
+        content: `
+          <h3>1. Excel interfeysining 4 ta asosiy ustuni</h3>
+          <p>Excel dasturiga kirganingizda, ekranda quyidagi asosiy elementlarni ko'rasiz:</p>
+          <div class="content-cards-grid">
+            <div class="info-card">
+              <div class="info-card-header"><i class="fa-solid fa-ribbon text-emerald"></i> <strong>Buyruqlar Lentasi (Ribbon)</strong></div>
+              <p>Ekran tepasidagi menyu. Barcha formatlash, shrift, jadval chizish va formula buyruqlari shu yerda joylashgan.</p>
+            </div>
+            <div class="info-card">
+              <div class="info-card-header"><i class="fa-solid fa-table-cells text-blue"></i> <strong>Katakchalar (Cells)</strong></div>
+              <p>Ustun (A, B, C...) va Qator (1, 2, 3...) kesishmasida hosil bo'ladigan asosiy ishchi blok. Masalan: <code>B2</code>.</p>
+            </div>
+          </div>
+        `,
+        quiz: {
+          question: "Excel'da A ustun va 3-qator kesishmasidagi katakcha manzili qanday yoziladi?",
+          options: [
+            { text: "3A", isCorrect: false },
+            { text: "A3", isCorrect: true, feedback: "To'g'ri! Avval ustun harfi (A), keyin qator raqami (3) yoziladi." },
+            { text: "A-3", isCorrect: false }
+          ]
+        }
+      },
+      {
+        id: 2,
+        title: "Ma'lumot Kiratish va Formatlash",
+        duration: "12 daqiqa",
+        module: "1-Modul: Asoslar",
+        summary: "Matn, son va sanalarni to'g'ri kiritish hamda kataklarni bo'yash.",
+        content: `<p>Excel'da ma'lumot turlarini to'g'ri kiritish va katak stilini soat kabi aniq sozlashni o'rganamiz.</p>`,
+        quiz: {
+          question: "Excel'da sonlar odatda katakchaning qaysi tomoniga tekislanadi?",
+          options: [
+            { text: "Chap tomonga", isCorrect: false },
+            { text: "O'ng tomonga", isCorrect: true, feedback: "Barakalla! Sonlar o'ng tomonga, matnlar esa chap tomonga tekislanadi." }
+          ]
+        }
+      },
+      {
+        id: 3,
+        title: "Birinchi Formulalar: SUM va AVERAGE",
+        duration: "15 daqiqa",
+        module: "2-Modul: Formulalar",
+        summary: "СУММ (SUM) va СРЗНАЧ (AVERAGE) formulalari yordamida yig'indi va o'rtacha qiymatni hisoblash.",
+        content: `<p>Barcha formulalar <code>=</code> belgisi bilan boshlanadi.</p>`,
+        quiz: {
+          question: "B2 dan B6 gacha sonlar yig'indisini hisoblaydigan formula qaysi?",
+          options: [
+            { text: "=SUM(B2:B6)", isCorrect: true, feedback: "Juda to'g'ri! =SUM(B2:B6) yordamida yig'indi topiladi." },
+            { text: "SUM(B2-B6)", isCorrect: false }
+          ]
+        }
+      },
+      {
+        id: 4,
+        title: "Sanash Formulalari: COUNT va COUNTA",
+        duration: "10 daqiqa",
+        module: "2-Modul: Formulalar",
+        summary: "Sonli va matnli kataklarni sanash.",
+        content: `<p>СЧЁТ va СЧЁТЗ funksiyalari o'rtasidagi farq.</p>`,
+        quiz: {
+          question: "Faqat sonli kataklarni sanash uchun qaysi funksiya ishlatiladi?",
+          options: [
+            { text: "=COUNT() (СЧЁТ)", isCorrect: true, feedback: "To'g'ri!" },
+            { text: "=COUNTA() (СЧЁТЗ)", isCorrect: false }
+          ]
+        }
+      },
+      {
+        id: 5,
+        title: "Maksimal va Minimal Qiymatlarni Topish (MAX, MIN)",
+        duration: "10 daqiqa",
+        module: "2-Modul: Formulalar",
+        summary: "Eng katta va eng kichik sonlarni aniqlash.",
+        content: `<p>МАКС va МИН funksiyalari.</p>`,
+        quiz: {
+          question: "Eng kichik qiymatni topish uchun qaysi formula ishlatiladi?",
+          options: [
+            { text: "=MIN()", isCorrect: true, feedback: "Ofarin!" },
+            { text: "=MAX()", isCorrect: false }
+          ]
+        }
+      },
+      {
+        id: 6,
+        title: "Qat'iy Qulflash: $ (Absolyut Manzillar)",
+        duration: "15 daqiqa",
+        module: "3-Modul: Qulflash",
+        summary: "$ belgisi yordamida kataklarni qulflash va F4 klavishasidan foydalanish.",
+        content: `<p>$D$1 shaklidagi qulflash formulani nusxalaganda o'zgarmaslikni ta'minlaydi.</p>`,
+        quiz: {
+          question: "Katakni tezda qulflash ($) uchun qaysi tugma bosiladi?",
+          options: [
+            { text: "F4", isCorrect: true, feedback: "To'g'ri! F4 klavishasi qulflash belgisini qo'shadi." },
+            { text: "F2", isCorrect: false }
+          ]
+        }
+      },
+      {
+        id: 7,
+        title: "Jadvallarni Saralash va Filtrlash (Sort & Filter)",
+        duration: "12 daqiqa",
+        module: "4-Modul: Tahlil",
+        summary: "Katta jadvallardan kerakli ma'lumotlarni suzib olish.",
+        content: `<p>Avtofiltr va A-Z saralash.</p>`,
+        quiz: {
+          question: "Filtr qo'yish uchun klaviatura shortkati qaysi?",
+          options: [
+            { text: "Ctrl + Shift + L", isCorrect: true, feedback: "To'g'ri!" },
+            { text: "Ctrl + F", isCorrect: false }
+          ]
+        }
+      },
+      {
+        id: 8,
+        title: "0-Daraja Checkpoint Imtihoni",
+        duration: "15 daqiqa",
+        module: "5-Modul: Yakunlash",
+        summary: "O'rgangan bilimlaringizni sinash va sertifikatga ega bo'lish.",
+        content: `<p>Amaliy trenajorda barcha topshiriqlarni yakunlang.</p>`,
+        quiz: {
+          question: "Formulani nusxalaganda qaysi manzil o'zgarmaydi?",
+          options: [
+            { text: "Absolyut ($A$1)", isCorrect: true, feedback: "A'lo!" },
+            { text: "Nisbiy (A1)", isCorrect: false }
+          ]
+        }
+      }
+    ]
+  },
+  pro: {
+    id: "pro",
+    title: "Excel Pro",
+    subtitle: "Analitika va Murakkab Formulalar",
+    badge: "Amaliyotchi & Tahlilchi",
+    description: "VLOOKUP, IF/SUMIF/COUNTIF shartli formulalari, Pivot Tables (Svodniy jadvallar), diagrammalar va ma'lumotlarni tozalash.",
+    lessons: [
+      {
+        id: 1,
+        title: "Mantiqiy Formulalar: IF (ЕСЛИ) Asoslari",
+        duration: "15 daqiqa",
+        module: "1-Modul: Shartli Formulalar",
+        summary: "Shartlarni tekshirish va shartga ko'ra natija berish.",
+        content: `<h3>IF (ЕСЛИ) funksiyasi sintaksisi</h3><p><code>=IF(shart, to'g'ri_bo'lsa, noto'g'ri_bo'lsa)</code></p>`,
+        quiz: {
+          question: "IF funksiyasida nechta asosiy argument mavjud?",
+          options: [
+            { text: "3 ta", isCorrect: true, feedback: "To'g'ri! Shart, True qiymati va False qiymati." },
+            { text: "2 ta", isCorrect: false }
+          ]
+        }
+      },
+      {
+        id: 2,
+        title: "Shartli Hisoblash: SUMIF va COUNTIF",
+        duration: "15 daqiqa",
+        module: "1-Modul: Shartli Formulalar",
+        summary: "Faqat belgilangan mezon bo'yicha yig'indi va sonni topish.",
+        content: `<p>СУММЕСЛИ va СЧЁТЕСЛИ funksiyalari.</p>`,
+        quiz: {
+          question: "Faqat 'Toshkent' shahridagi sotuvlar yig'indisini topish uchun qaysi funksiya kerak?",
+          options: [
+            { text: "=SUMIF() (СУММЕСЛИ)", isCorrect: true, feedback: "To'g'ri!" },
+            { text: "=COUNT()", isCorrect: false }
+          ]
+        }
+      },
+      {
+        id: 3,
+        title: "Kengaytirilgan Qidiruv: VLOOKUP (ВПР)",
+        duration: "20 daqiqa",
+        module: "2-Modul: Qidiruv",
+        summary: "Jadvaldan kerakli ma'lumotni avtomatik topib keltirish.",
+        content: `<p>ВПР (VLOOKUP) funksiyasining 4 ta argumenti.</p>`,
+        quiz: {
+          question: "VLOOKUP funksiyasida aniq moslik (Exact Match) uchun oxirgi argumentga nima yoziladi?",
+          options: [
+            { text: "0 (yoki FALSE)", isCorrect: true, feedback: "Ofarin! 0 yoki FALSE aniq moslikni bildiradi." },
+            { text: "1 (yoki TRUE)", isCorrect: false }
+          ]
+        }
+      },
+      {
+        id: 4,
+        title: "Gorizontal Qidiruv: HLOOKUP va MATCH",
+        duration: "15 daqiqa",
+        module: "2-Modul: Qidiruv",
+        summary: "Qatorlar bo'yicha qidiruv va pozitsiyani aniqlash.",
+        content: `<p>HLOOKUP va MATCH funksiyalari.</p>`,
+        quiz: {
+          question: "MATCH funksiyasi nimani qaytaradi?",
+          options: [
+            { text: "Elementning qatordagi/ustundagi o'rnini (indeksini)", isCorrect: true, feedback: "To'g'ri!" },
+            { text: "Elementning rangini", isCorrect: false }
+          ]
+        }
+      },
+      {
+        id: 5,
+        title: "Pivot Tables (Сводные таблицы) Bilan Ishlash",
+        duration: "25 daqiqa",
+        module: "3-Modul: Hisobotlar",
+        summary: "Minglab qator ma'lumotlarni 1 daqiqada guruhlash va hisobot tuzish.",
+        content: `<p>Pivot Table va Slicer interfeysi.</p>`,
+        quiz: {
+          question: "Pivot Table hosil qilish uchun qaysi menyudan foydalaniladi?",
+          options: [
+            { text: "Вставка (Insert) -> PivotTable", isCorrect: true, feedback: "Juda to'g'ri!" },
+            { text: "Вид (View)", isCorrect: false }
+          ]
+        }
+      },
+      {
+        id: 6,
+        title: "Interaktiv Diagrammalar va Slicerlar",
+        duration: "18 daqiqa",
+        module: "3-Modul: Hisobotlar",
+        summary: "Dinamik grafiklar va tugmali filtrlar yaratish.",
+        content: `<p>PivotChart va Slicer vidjetlari.</p>`,
+        quiz: {
+          question: "Diagrammalarni tugmalar orqali filtrlash vositasi nima deyiladi?",
+          options: [
+            { text: "Slicer (Срез)", isCorrect: true, feedback: "Barakalla!" },
+            { text: "Macro", isCorrect: false }
+          ]
+        }
+      },
+      {
+        id: 7,
+        title: "Ma'lumotlarni Tekshirish (Data Validation)",
+        duration: "15 daqiqa",
+        module: "4-Modul: Tozalash",
+        summary: "Kataklarga faqat ko'rsatilgan ro'yxat bo'yicha ma'lumot kiritishni cheklash.",
+        content: `<p>Afto-ro'yxat (Dropdown List) yaratish.</p>`,
+        quiz: {
+          question: "Katakda tushuvchi ro'yxat (Dropdown) yaratish vositasi qaysi?",
+          options: [
+            { text: "Data Validation (Проверка данных)", isCorrect: true, feedback: "To'g'ri!" },
+            { text: "Conditional Formatting", isCorrect: false }
+          ]
+        }
+      },
+      {
+        id: 8,
+        title: "Excel Pro Checkpoint Imtihoni",
+        duration: "20 daqiqa",
+        module: "5-Modul: Yakunlash",
+        summary: "VLOOKUP, IF va Pivot Table bo'yicha amaliy topshiriqlar.",
+        content: `<p>Pro daraja sertifikati uchun sinov topshiring.</p>`,
+        quiz: {
+          question: "Qaysi vosita katta ma'lumotlarni soniyalarda hisobotga aylantiradi?",
+          options: [
+            { text: "Pivot Table", isCorrect: true, feedback: "A'lo!" },
+            { text: "Calculator", isCorrect: false }
+          ]
+        }
+      }
+    ]
+  },
+  promax: {
+    id: "promax",
+    title: "Excel Pro Max",
+    subtitle: "Ekspert, Avtomatlashtirish & Dashboard",
+    badge: "Ekspert & Dashboard Master",
+    description: "INDEX-MATCH, XLOOKUP, Dynamic Array formulalari, VBA Makroslar, Power Query hamda interaktiv biznes Dashboardlar.",
+    lessons: [
+      {
+        id: 1,
+        title: "VLOOKUP dan Kuchliroq: INDEX va MATCH",
+        duration: "20 daqiqa",
+        module: "1-Modul: Ekspert Formulalar",
+        summary: "Chapga qidiruv va dinamik ustunlar bilan ishlash.",
+        content: `<h3>INDEX-MATCH juftligi</h3><p><code>=INDEX(natija_diapazoni, MATCH(qidiruv_qiymati, qidiruv_diapazoni, 0))</code></p>`,
+        quiz: {
+          question: "INDEX-MATCH ning VLOOKUP dan asosiy afzalligi nima?",
+          options: [
+            { text: "Chap tomondagi ustunlardan ham ma'lumot qidira oladi", isCorrect: true, feedback: "To'g'ri!" },
+            { text: "Faqat sonlar bilan ishlaydi", isCorrect: false }
+          ]
+        }
+      },
+      {
+        id: 2,
+        title: "Zamonaviy Qidiruv: XLOOKUP (ЛПР)",
+        duration: "18 daqiqa",
+        module: "1-Modul: Ekspert Formulalar",
+        summary: "Excel 365 ning eng so'nggi va mukammal qidiruv funksiyasi.",
+        content: `<p>XLOOKUP funksiyasi sintaksisi.</p>`,
+        quiz: {
+          question: "XLOOKUP funksiyasida sukut bo'yicha aniq moslik ishlaydimi?",
+          options: [
+            { text: "Ha, sukut bo'yicha (Default) aniq moslik qidiradi", isCorrect: true, feedback: "Barakalla!" },
+            { text: "Yo'q", isCorrect: false }
+          ]
+        }
+      },
+      {
+        id: 3,
+        title: "Dinamik Massivlar: FILTER, UNIQUE va SORT",
+        duration: "22 daqiqa",
+        module: "2-Modul: Dynamic Arrays",
+        summary: "Bitta formula yordamida butun jadvalni filtrlash va saralash.",
+        content: `<p>FILTER va UNIQUE funksiyalari.</p>`,
+        quiz: {
+          question: "Takrorlanmas (Unikal) qiymatlarni ajratib olish funksiyasi qaysi?",
+          options: [
+            { text: "=UNIQUE()", isCorrect: true, feedback: "To'g'ri!" },
+            { text: "=COUNT()", isCorrect: false }
+          ]
+        }
+      },
+      {
+        id: 4,
+        title: "Power Query: Ma'lumotlarni Transformatsiya Qilish",
+        duration: "30 daqiqa",
+        module: "3-Modul: ETL & Automation",
+        summary: "Turli manbalardan (PDF, Web, SQL) ma'lumotlarni yuklab avtomatik tozalash.",
+        content: `<p>Power Query Editor vositasi.</p>`,
+        quiz: {
+          question: "Power Query da bajarilgan qadamlar saqlanib, tugma bosganda avtomatik takrorlanadimi?",
+          options: [
+            { text: "Ha, 'Applied Steps' har safar avtomatik qayta bajariladi", isCorrect: true, feedback: "To'g'ri!" },
+            { text: "Yo'q, qo'lda yoziladi", isCorrect: false }
+          ]
+        }
+      },
+      {
+        id: 5,
+        title: "VBA Makroslar: Bir Xil Ishlarni Avtomatlashtirish",
+        duration: "25 daqiqa",
+        module: "3-Modul: ETL & Automation",
+        summary: "Macro Recorder va VBA kod yozish orqali jarayonlarni 1 tugmaga joylash.",
+        content: `<p>Visual Basic for Applications (VBA).</p>`,
+        quiz: {
+          question: "Makroslarni yozib olish vositasi nima deyiladi?",
+          options: [
+            { text: "Record Macro", isCorrect: true, feedback: "A'lo!" },
+            { text: "AutoCorrect", isCorrect: false }
+          ]
+        }
+      },
+      {
+        id: 6,
+        title: "Interaktiv Biznes Dashboard Yaratish",
+        duration: "35 daqiqa",
+        module: "4-Modul: Dashboards",
+        summary: "Rahbariyat uchun 1 sahifalik dinamik ko'rsatkichlar paneli (KPI Dashboard).",
+        content: `<p>KPI kartalar va Pivot Diagrammalar uyg'unligi.</p>`,
+        quiz: {
+          question: "Dashboardning asosiy maqsadi nima?",
+          options: [
+            { text: "Biznesning asosiy ko'rsatkichlarini (KPI) bitta ekranda vizual ko'rsatish", isCorrect: true, feedback: "Juda to'g'ri!" },
+            { text: "Faqat rasm chizish", isCorrect: false }
+          ]
+        }
+      },
+      {
+        id: 7,
+        title: "Murakkab Shartli Formatlash va KPI Indicatorlar",
+        duration: "20 daqiqa",
+        module: "4-Modul: Dashboards",
+        summary: "Formulalar asosida kataklarni dinamik bo'yash va ikonkalardan foydalanish.",
+        content: `<p>Formula bazasidagi Conditional Formatting.</p>`,
+        quiz: {
+          question: "Shartli formatlashda formulalardan foydalansa bo'ladimi?",
+          options: [
+            { text: "Ha, istalgan mantiqiy formula asosida rang berish mumkin", isCorrect: true, feedback: "To'g'ri!" },
+            { text: "Yo'q", isCorrect: false }
+          ]
+        }
+      },
+      {
+        id: 8,
+        title: "Excel Pro Max Checkpoint & Sertifikat",
+        duration: "30 daqiqa",
+        module: "5-Modul: Yakunlash",
+        summary: "Pro Max darajadagi kompleks loyihani topshirish.",
+        content: `<p>Ekspert sertifikatiga ega bo'lish uchun sinov.</p>`,
+        quiz: {
+          question: "Excel 365 da eng zamonaviy va qulay qidiruv funksiyasi qaysi?",
+          options: [
+            { text: "XLOOKUP", isCorrect: true, feedback: "Barakalla!" },
+            { text: "LOOKUP", isCorrect: false }
+          ]
+        }
+      }
+    ]
+  }
+};
+
 export const DIAGNOSTIC_QUESTIONS = [
   {
     id: 1,
-    question: "Excel bilan avval ishlaganmisiz yoki tanishligingiz qanday?",
+    question: "Excel dasturi bilan tajribangiz va tanishligingiz darajasi qanday?",
     icon: "fa-solid fa-chart-simple",
     options: [
       {
         text: "Umuman yo'q, noldan boshlayapman",
-        desc: "Excel dasturini deyarli ochib ko'rmaganman yoki faqat oddiy matn yozganman",
-        score: 0,
-        recLevel: "0-daraja (Mutlaqo Boshlang'ich)"
+        desc: "Excel dasturini deyarli ochib ko'rmaganman yoki faqat oddiy matn kiritganman",
+        targetCourse: "boshlangich",
+        recTitle: "Excel Boshlang'ich",
+        whyReason: "Siz Excel bilan endi tanishayotganingiz uchun poydevorni to'g'ri qo'yish va kataklar b-n ishlashni 1-darsdan o'rganish eng to'g'ri yo'ldir."
       },
       {
         text: "Asosiy amallarni bilaman",
-        desc: "Jadval chizish, katakchalarni bo'yash va oddiy qo'shish-ayirishni bilaman",
-        score: 1,
-        recLevel: "0-daraja (Poydevorni mustahkamlash)"
+        desc: "Jadval chizish, kataklarni bo'yash va oddiy SUM/AVERAGE ni bilaman",
+        targetCourse: "pro",
+        recTitle: "Excel Pro",
+        whyReason: "Siz Excel asoslarini va oddiy formulalarni bilar ekansiz. Siz uchun VLOOKUP, IF va Pivot jadvallarni o'rganadigan Pro kursi juda mos!"
       },
       {
         text: "Formulalarni ozgina ishlataman",
-        desc: "SUM, AVERAGE kabi tayyor funksiyalarni ishlatganman, lekin murakkab tahlillarda qiynalaman",
-        score: 2,
-        recLevel: "0-daraja tezkor o'tish & Pro tayyorgarlik"
+        desc: "SUM, IF yoki VLOOKUP b-n ishlaganman, lekin murakkab tahlillarda qo'shimcha bilim kerak",
+        targetCourse: "conditional", // Needs follow up Q
+        recTitle: "Excel Pro / Pro Max",
+        whyReason: "Formulalar bo'yicha tajribangiz bor. Aniq mos kursni tanlash uchun 1 ta qo'shimcha savol beramiz."
       }
     ]
   },
   {
     id: 2,
-    question: "Excel bilimlarini qaysi sohada qo'llamoqchisiz?",
+    question: "Excel bilimlarini ko'proq qaysi yo'nalishda qo'llamoqchisiz?",
     icon: "fa-solid fa-briefcase",
     options: [
-      {
-        text: "Moliya, buxgalteriya yoki hisob-kitob",
-        desc: "Kirim-chiqim, oylik maoshlar va moliyaviy hisobotlar uchun",
-        score: 1
-      },
-      {
-        text: "Savdo, marketing va CRM tahlili",
-        desc: "Mijozlar bazasi, savdo hajmi va dinamikani kuzatish uchun",
-        score: 1
-      },
-      {
-        text: "O'qish, shaxsiy boshqaruv yoki freelance",
-        desc: "Shaxsiy byudjet, rejalashtirish yoki masofaviy ishlarda qo'llash",
-        score: 1
-      },
-      {
-        text: "Karyerada o'sish va yangi nufuzli ish topish",
-        desc: "Rezyumeni kuchaytirish va zamonaviy ofis talablariga javob berish",
-        score: 1
-      }
+      { text: "Moliya, buxgalteriya va hisob-kitob", desc: "Oylik maoshlar va moliyaviy hisobotlar" },
+      { text: "Savdo, marketing va CRM tahlili", desc: "Mijozlar bazasi va savdo dinamikasi" },
+      { text: "Karyerada o'sish va yangi nufuzli ish", desc: "Rezyumeni kuchaytirish va ofis talablari" }
     ]
   },
   {
     id: 3,
-    question: "Quyidagi formulalardan qaysi birining vazifasini aniq bilasiz?",
+    question: "Quyidagi vositalardan qaysi birida erkin ishlay olasiz?",
     icon: "fa-solid fa-square-root-variable",
     options: [
-      {
-        text: "Hech birini bilmayman yoki adashtiraman",
-        desc: "Formulalar qanday ishlashini to'liq tushunishni xohlayman",
-        score: 0
-      },
-      {
-        text: "Faqat =СУММ() yoki =SUM() yig'indisini bilaman",
-        desc: "Boshqa formulalar sintaksisi va parametrlarini yaxshi bilmayman",
-        score: 1
-      },
-      {
-        text: "=ЕСЛИ() (IF), =ВПР() (VLOOKUP) yoki $A$1 qulflashni bilaman",
-        desc: "Formulalar bilan tajribam bor, amaliyotda tezkorlik kerak",
-        score: 2
-      }
+      { text: "Faqat oddiy kataklar va yig'indini bilaman", desc: "Boshlang'ich daraja" },
+      { text: "VLOOKUP, IF yoki Svodniy jadvalni bilaman", desc: "Pro daraja" },
+      { text: "INDEX-MATCH, XLOOKUP yoki Dashboardlarni bilaman", desc: "Ekspert daraja" }
     ]
   },
   {
     id: 4,
-    question: "Kuniga Excel o'rganish uchun qancha vaqt ajrata olasiz?",
-    icon: "fa-solid fa-clock",
+    // Conditional follow up question for option 3
+    isConditional: true,
+    question: "Formulalar bo'yicha: VLOOKUP va IF formulalaridan foydalanib murakkab hisobot tayyorlay olasizmi?",
+    icon: "fa-solid fa-wand-magic-sparkles",
     options: [
       {
-        text: "Kuniga 15-20 daqiqa (Tezkor mikro-darslar)",
-        desc: "Kichik qadamlar bilan, har kuni muntazam ravishda",
-        score: 1
+        text: "Yo'q, VLOOKUP/IF ni hali chuqur bilmayman",
+        desc: "VLOOKUP va IF ni amaliyotda mustahkamlamoqchiman",
+        targetCourse: "pro",
+        recTitle: "Excel Pro",
+        whyReason: "Siz VLOOKUP va IF kabi tahliliy formulalarni mukammal egallashingiz uchun Excel Pro kursi 1-darsidan boshlash tavsiya etiladi."
       },
       {
-        text: "Kuniga 45-60 daqiqa (Intensiv o'rganish)",
-        desc: "Darslar va Formula trenajorida amaliy mashqlar qilib",
-        score: 2
-      },
-      {
-        text: "Hafta oxirlarida to'liq amaliyot",
-        desc: "Dam olish kunlari to'liq botib o'rganish",
-        score: 1
+        text: "Ha, VLOOKUP/IF ni yaxshi bilaman. Menga Dashboard va VBA/Makroslar kerak",
+        desc: "Dinamik grafiklar, Power Query va avtomatlashtirish",
+        targetCourse: "promax",
+        recTitle: "Excel Pro Max",
+        whyReason: "Siz asosiy va o'rta formulalarni yaxshi bilganingiz uchun, sizga eng yuqori darajadagi Excel Pro Max (Dashboard & Automation) kursi mos keladi!"
       }
     ]
   }

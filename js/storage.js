@@ -119,10 +119,28 @@ export class StorageManager {
     }
   }
 
-  // Darslar progressini olish: { completedLessonIds: [1, 2], unlockedLessonIds: [1, 2, 3] }
-  static getLessonsProgress() {
+  // Joriy kurs ID si (boshlangich, pro, promax)
+  static getCurrentCourseId() {
     try {
-      const data = localStorage.getItem(STORAGE_KEYS.LESSONS_PROGRESS);
+      return localStorage.getItem("excelmasters_current_course") || "boshlangich";
+    } catch {
+      return "boshlangich";
+    }
+  }
+
+  static setCurrentCourseId(courseId) {
+    try {
+      localStorage.setItem("excelmasters_current_course", courseId);
+    } catch (e) {
+      console.error("Set course ID error", e);
+    }
+  }
+
+  // Darslar progressini ko'rsatilgan kurs ID bo'yicha olish
+  static getLessonsProgress(courseId = this.getCurrentCourseId()) {
+    try {
+      const key = `${STORAGE_KEYS.LESSONS_PROGRESS}_${courseId}`;
+      const data = localStorage.getItem(key);
       if (data) {
         return JSON.parse(data);
       }
@@ -132,7 +150,7 @@ export class StorageManager {
         unlockedLessonIds: [1],
         quizScores: {}
       };
-      this.setLessonsProgress(initial);
+      this.setLessonsProgress(initial, courseId);
       return initial;
     } catch {
       return { completedLessonIds: [], unlockedLessonIds: [1], quizScores: {} };
@@ -140,9 +158,10 @@ export class StorageManager {
   }
 
   // Darslar progressini saqlash
-  static setLessonsProgress(progressObj) {
+  static setLessonsProgress(progressObj, courseId = this.getCurrentCourseId()) {
     try {
-      localStorage.setItem(STORAGE_KEYS.LESSONS_PROGRESS, JSON.stringify(progressObj));
+      const key = `${STORAGE_KEYS.LESSONS_PROGRESS}_${courseId}`;
+      localStorage.setItem(key, JSON.stringify(progressObj));
       return progressObj;
     } catch (e) {
       console.error("Lessons progress storage error", e);
@@ -151,10 +170,11 @@ export class StorageManager {
   }
 
   // Darsni tugallangan deb belgilash va keyingisini ochish
-  static completeLesson(lessonId, quizScore = 100) {
-    const progress = this.getLessonsProgress();
+  static completeLesson(lessonId, quizScore = 100, courseId = this.getCurrentCourseId()) {
+    const progress = this.getLessonsProgress(courseId);
     if (!progress.completedLessonIds.includes(lessonId)) {
       progress.completedLessonIds.push(lessonId);
+      this.addXP(50); // Darsni tugatgani uchun +50 XP
     }
     progress.quizScores[lessonId] = quizScore;
 
@@ -164,23 +184,23 @@ export class StorageManager {
       progress.unlockedLessonIds.push(nextLessonId);
     }
 
-    this.setLessonsProgress(progress);
+    this.setLessonsProgress(progress, courseId);
     return progress;
   }
 
   // Oxirgi ko'rilgan dars ID
-  static getCurrentLessonId() {
+  static getCurrentLessonId(courseId = this.getCurrentCourseId()) {
     try {
-      const id = localStorage.getItem(STORAGE_KEYS.CURRENT_LESSON);
+      const id = localStorage.getItem(`${STORAGE_KEYS.CURRENT_LESSON}_${courseId}`);
       return id ? parseInt(id, 10) : 1;
     } catch {
       return 1;
     }
   }
 
-  static setCurrentLessonId(lessonId) {
+  static setCurrentLessonId(lessonId, courseId = this.getCurrentCourseId()) {
     try {
-      localStorage.setItem(STORAGE_KEYS.CURRENT_LESSON, lessonId.toString());
+      localStorage.setItem(`${STORAGE_KEYS.CURRENT_LESSON}_${courseId}`, lessonId.toString());
     } catch (e) {
       console.error("Current lesson storage error", e);
     }

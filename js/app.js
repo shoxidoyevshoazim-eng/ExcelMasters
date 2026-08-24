@@ -2,7 +2,7 @@
  * Excel Masters MVP - Asosiy Dastur Kontrolleri (Main App Controller)
  */
 
-import { DIAGNOSTIC_QUESTIONS, COURSE_LESSONS, TRAINER_TASKS } from "./data.js";
+import { DIAGNOSTIC_QUESTIONS, COURSES_DATA, TRAINER_TASKS } from "./data.js";
 import { FormulaEngine } from "./formulaEngine.js";
 import { StorageManager } from "./storage.js";
 import { UIManager } from "./ui.js";
@@ -16,7 +16,8 @@ class ExcelMastersApp {
     this.currentView = "hero-view";
     this.diagCurrentStep = 0;
     this.diagAnswers = [];
-    this.currentLessonId = StorageManager.getCurrentLessonId();
+    this.currentCourseId = StorageManager.getCurrentCourseId();
+    this.currentLessonId = StorageManager.getCurrentLessonId(this.currentCourseId);
     this.currentTaskId = 1;
     this.selectedCell = "B7";
     this.trainerScores = {};
@@ -497,35 +498,62 @@ class ExcelMastersApp {
   }
 
   finishDiagnosticTest() {
-    const totalScore = this.diagAnswers.reduce((acc, curr) => acc + curr.score, 0);
-    let levelTitle = "0-Daraja (Boshlang'ich Poydevor)";
-    let levelDesc = "Diagnostika natijasiga ko'ra, siz uchun Excel asoslari, kataklar bilan to'g'ri ishlash va ilk formulalarni o'rganish juda mos keladi.";
+    let recommendedKey = "boshlangich";
+    let whyReason = "Siz Excel bilan endi tanishayotganingiz uchun poydevorni to'g'ri qo'yish va kataklar b-n ishlashni 1-darsdan o'rganish eng to'g'ri yo'ldir.";
 
-    if (totalScore >= 5) {
-      levelTitle = "0-Daraja Tezkor Kurs & Pro Tayyorgarlik";
-      levelDesc = "Sizda ma'lum darajada tajriba bor. 0-darajaning trenajor checkpointidan tezkor o'tib, Pro kursimizga tayyorlanishingiz mumkin!";
+    // 1-savol javobini tekshirish
+    const q1Ans = this.diagAnswers.find((a) => a.questionId === 1);
+    if (q1Ans) {
+      if (q1Ans.selectedText.includes("Umuman yo'q")) {
+        recommendedKey = "boshlangich";
+        whyReason = "Siz Excel bilan endi tanishayotganingiz uchun poydevorni to'g'ri qo'yish va kataklar b-n ishlashni 1-darsdan o'rganish eng to'g'ri yo'ldir.";
+      } else if (q1Ans.selectedText.includes("Asosiy amallarni bilaman")) {
+        recommendedKey = "pro";
+        whyReason = "Siz Excel asoslarini va oddiy formulalarni bilar ekansiz. Siz uchun VLOOKUP, IF va Pivot jadvallarni o'rganadigan Pro kursi juda mos!";
+      } else if (q1Ans.selectedText.includes("Formulalarni ozgina")) {
+        const q4Ans = this.diagAnswers.find((a) => a.questionId === 4);
+        if (q4Ans && q4Ans.selectedText.includes("Dashboard va VBA")) {
+          recommendedKey = "promax";
+          whyReason = "Siz VLOOKUP/IF kabi o'rta formulalarni yaxshi bilganingiz uchun, sizga eng yuqori darajadagi Excel Pro Max (Dashboard & Automation) kursi mos keladi!";
+        } else {
+          recommendedKey = "pro";
+          whyReason = "Siz VLOOKUP va IF kabi tahliliy formulalarni mukammal egallashingiz uchun Excel Pro kursi 1-darsidan boshlash tavsiya etiladi.";
+        }
+      }
     }
+
+    const courseObj = COURSES_DATA[recommendedKey] || COURSES_DATA.boshlangich;
 
     // Saqlash
     StorageManager.setDiagnosticResult({
       answers: this.diagAnswers,
-      totalScore,
-      recommendedLevel: levelTitle
+      recommendedKey,
+      levelName: courseObj.title,
+      whyReason
     });
 
     document.getElementById("diag-question-container").style.display = "none";
     document.getElementById("diag-result-container").style.display = "block";
-    document.getElementById("diag-result-level-title").textContent = levelTitle;
-    document.getElementById("diag-result-level-desc").textContent = levelDesc;
+    
+    const titleEl = document.getElementById("diag-result-level-title");
+    const whyEl = document.getElementById("diag-result-why-reason");
+    const btnTitleEl = document.getElementById("diag-btn-course-title");
+
+    if (titleEl) titleEl.textContent = courseObj.title;
+    if (whyEl) whyEl.textContent = whyReason;
+    if (btnTitleEl) btnTitleEl.textContent = courseObj.title;
+
+    this.recommendedCourseKey = recommendedKey;
 
     this.ui.playSound("fanfare");
     this.ui.launchConfetti();
 
-    // Agar foydalanuvchi ma'lumoti bo'lmasa, lead capture modalini ko'rsatamiz
+    // Lead capture modal ko'rsatish
     const user = StorageManager.getUser();
     if (!user || !user.name) {
       setTimeout(() => {
-        document.getElementById("user-modal").classList.add("open");
+        const userModal = document.getElementById("user-modal");
+        if (userModal) userModal.classList.add("open");
       }, 900);
     }
   }
@@ -534,6 +562,8 @@ class ExcelMastersApp {
     const continueBtn = document.getElementById("diag-continue-to-course-btn");
     if (continueBtn) {
       continueBtn.addEventListener("click", () => {
+        const targetCourse = this.recommendedCourseKey || "boshlangich";
+        this.switchCourse(targetCourse, 1);
         this.switchView("course-view");
         this.ui.playSound("click");
       });
@@ -541,23 +571,71 @@ class ExcelMastersApp {
   }
 
   // ==========================================================================
-  // 0-Daraja Kursi (LMS) Mantiqi
+  // 3 Bosqichli Kurslar (LMS) Mantiqi
   // ==========================================================================
+  bindCourseEvents() {
+    // Course switcher tabs
+    const switcherBtns = document.querySelectorAll(".course-switcher-btn");
+    switcherBtns.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const courseId = btn.getAttribute("data-course");
+        if (courseId) {
+          this.switchCourse(courseId);
+          this.ui.playSound("click");
+        }
+      });
+    });
+
+    const goTrainerBtn = document.getElementById("sidebar-go-trainer-btn");
+    if (goTrainerBtn) {
+      goTrainerBtn.addEventListener("click", () => {
+        this.switchView("trainer-view");
+        this.ui.playSound("click");
+      });
+    }
+  }
+
+  switchCourse(courseId, lessonId = null) {
+    if (!COURSES_DATA[courseId]) courseId = "boshlangich";
+
+    this.currentCourseId = courseId;
+    StorageManager.setCurrentCourseId(courseId);
+
+    // Switcher tab-bar aktivligini yangilash
+    document.querySelectorAll(".course-switcher-btn").forEach((btn) => {
+      btn.classList.toggle("active", btn.getAttribute("data-course") === courseId);
+    });
+
+    const courseObj = COURSES_DATA[courseId];
+    const sidebarTitle = document.getElementById("sidebar-course-title");
+    if (sidebarTitle) {
+      sidebarTitle.innerHTML = `<i class="fa-solid fa-graduation-cap"></i> ${courseObj.title} Darslari`;
+    }
+
+    const activeLessonId = lessonId || StorageManager.getCurrentLessonId(courseId);
+    this.renderCourseSidebar();
+    this.loadLesson(activeLessonId);
+  }
+
   renderCourseSidebar() {
-    const progress = StorageManager.getLessonsProgress();
+    const courseObj = COURSES_DATA[this.currentCourseId] || COURSES_DATA.boshlangich;
+    const lessons = courseObj.lessons;
+    const progress = StorageManager.getLessonsProgress(this.currentCourseId);
     const listContainer = document.getElementById("sidebar-lessons-list");
     if (!listContainer) return;
 
-    const completedCount = progress.completedLessonIds.length;
-    const totalCount = COURSE_LESSONS.length;
+    const completedCount = progress.completedLessonIds ? progress.completedLessonIds.length : 0;
+    const totalCount = lessons.length;
     const percent = Math.round((completedCount / totalCount) * 100);
 
-    document.getElementById("course-progress-text").textContent = `${completedCount}/${totalCount} Tugallandi (${percent}%)`;
-    document.getElementById("course-progress-bar-fill").style.width = `${percent}%`;
+    const progressText = document.getElementById("course-progress-text");
+    const progressFill = document.getElementById("course-progress-bar-fill");
+    if (progressText) progressText.textContent = `${completedCount}/${totalCount} Tugallandi (${percent}%)`;
+    if (progressFill) progressFill.style.width = `${percent}%`;
 
-    listContainer.innerHTML = COURSE_LESSONS.map((lesson) => {
-      const isUnlocked = progress.unlockedLessonIds.includes(lesson.id);
-      const isCompleted = progress.completedLessonIds.includes(lesson.id);
+    listContainer.innerHTML = lessons.map((lesson) => {
+      const isUnlocked = progress.unlockedLessonIds && progress.unlockedLessonIds.includes(lesson.id);
+      const isCompleted = progress.completedLessonIds && progress.completedLessonIds.includes(lesson.id);
       const isActive = lesson.id === this.currentLessonId;
 
       let statusIcon = '<i class="fa-solid fa-lock"></i>';
@@ -586,7 +664,7 @@ class ExcelMastersApp {
     }).join("");
 
     // Darsni bosganda yuklash
-    listContainer.querySelectorAll(".lesson-item-btn").forEach(btn => {
+    listContainer.querySelectorAll(".lesson-item-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
         const id = parseInt(btn.getAttribute("data-lesson-id"), 10);
         if (id) {
@@ -598,22 +676,31 @@ class ExcelMastersApp {
   }
 
   loadLesson(lessonId) {
-    const lesson = COURSE_LESSONS.find(l => l.id === lessonId);
+    const courseObj = COURSES_DATA[this.currentCourseId] || COURSES_DATA.boshlangich;
+    const lessons = courseObj.lessons;
+    const lesson = lessons.find((l) => l.id === lessonId) || lessons[0];
     if (!lesson) return;
 
-    this.currentLessonId = lessonId;
-    StorageManager.setCurrentLessonId(lessonId);
+    this.currentLessonId = lesson.id;
+    StorageManager.setCurrentLessonId(lesson.id, this.currentCourseId);
 
     // Sidebar faolligini yangilash
     this.renderCourseSidebar();
 
     // Sarlavha va meta
-    document.getElementById("lesson-module-pill").textContent = lesson.module;
-    document.getElementById("lesson-duration-pill").innerHTML = `<i class="fa-regular fa-clock"></i> ${lesson.duration}`;
-    document.getElementById("lesson-title-heading").textContent = `${lesson.id}-Dars: ${lesson.title}`;
-    document.getElementById("lesson-summary-box").textContent = lesson.summary;
-    document.getElementById("video-box-title").textContent = lesson.videoPlaceholder;
-    document.getElementById("lesson-content-body").innerHTML = lesson.content;
+    const modulePill = document.getElementById("lesson-module-pill");
+    const durationPill = document.getElementById("lesson-duration-pill");
+    const titleHeading = document.getElementById("lesson-title-heading");
+    const summaryBox = document.getElementById("lesson-summary-box");
+    const videoBoxTitle = document.getElementById("video-box-title");
+    const contentBody = document.getElementById("lesson-content-body");
+
+    if (modulePill) modulePill.textContent = lesson.module;
+    if (durationPill) durationPill.innerHTML = `<i class="fa-regular fa-clock"></i> ${lesson.duration}`;
+    if (titleHeading) titleHeading.textContent = `${lesson.id}-Dars: ${lesson.title}`;
+    if (summaryBox) summaryBox.textContent = lesson.summary;
+    if (videoBoxTitle) videoBoxTitle.textContent = lesson.videoPlaceholder || lesson.title;
+    if (contentBody) contentBody.innerHTML = lesson.content || "<p>Dars kontenti yuklanmoqda...</p>";
 
     // Mini-Quizni tayyorlash
     this.renderLessonQuiz(lesson);
@@ -621,10 +708,10 @@ class ExcelMastersApp {
     // Oldingi / Keyingi tugmalar
     const prevBtn = document.getElementById("prev-lesson-btn");
     const nextBtn = document.getElementById("next-lesson-btn");
-    const progress = StorageManager.getLessonsProgress();
+    const progress = StorageManager.getLessonsProgress(this.currentCourseId);
 
-    prevBtn.disabled = lessonId <= 1;
-    nextBtn.disabled = !progress.unlockedLessonIds.includes(lessonId + 1);
+    if (prevBtn) prevBtn.disabled = lesson.id <= 1;
+    if (nextBtn) nextBtn.disabled = !(progress.unlockedLessonIds && progress.unlockedLessonIds.includes(lesson.id + 1));
 
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -672,14 +759,16 @@ class ExcelMastersApp {
       feedbackBox.innerHTML = `<strong>Ajoyib!</strong> ${selected.feedback || "To'g'ri javob berdingiz!"}`;
 
       // Darsni tugatish va keyingisini ochish
-      StorageManager.completeLesson(lesson.id);
+      StorageManager.completeLesson(lesson.id, 100, this.currentCourseId);
       this.renderCourseSidebar();
+      this.updateUserUI();
       this.ui.playSound("correct");
       this.ui.showToast("Dars muvaffaqiyatli yakunlandi! Keyingi dars ochildi.", "success");
 
       // Keyingi tugmani faollashtirish
       const nextBtn = document.getElementById("next-lesson-btn");
-      if (lesson.id < COURSE_LESSONS.length) {
+      const lessonsList = COURSES_DATA[this.currentCourseId] ? COURSES_DATA[this.currentCourseId].lessons : [];
+      if (lesson.id < lessonsList.length && nextBtn) {
         nextBtn.disabled = false;
       }
     } else {
@@ -700,9 +789,22 @@ class ExcelMastersApp {
   }
 
   bindCourseEvents() {
+    // Course switcher tabs
+    const switcherBtns = document.querySelectorAll(".course-switcher-btn");
+    switcherBtns.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const courseId = btn.getAttribute("data-course");
+        if (courseId) {
+          this.switchCourse(courseId);
+          this.ui.playSound("click");
+        }
+      });
+    });
+
     const prevBtn = document.getElementById("prev-lesson-btn");
     const nextBtn = document.getElementById("next-lesson-btn");
     const goTrainerBtn = document.getElementById("sidebar-go-trainer-btn");
+    const videoPlayTrigger = document.getElementById("video-play-trigger");
 
     if (prevBtn) {
       prevBtn.addEventListener("click", () => {
@@ -715,7 +817,8 @@ class ExcelMastersApp {
 
     if (nextBtn) {
       nextBtn.addEventListener("click", () => {
-        if (this.currentLessonId < COURSE_LESSONS.length) {
+        const lessonsList = COURSES_DATA[this.currentCourseId] ? COURSES_DATA[this.currentCourseId].lessons : [];
+        if (this.currentLessonId < lessonsList.length) {
           this.loadLesson(this.currentLessonId + 1);
           this.ui.playSound("click");
         }
@@ -729,7 +832,6 @@ class ExcelMastersApp {
       });
     }
 
-    const videoPlayTrigger = document.getElementById("video-play-trigger");
     if (videoPlayTrigger) {
       videoPlayTrigger.addEventListener("click", () => {
         this.ui.showToast("Video darslik namoyishi faollashtirildi!", "info");

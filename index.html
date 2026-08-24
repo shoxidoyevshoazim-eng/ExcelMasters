@@ -336,11 +336,11 @@
     <div class="modal-box">
       <button class="modal-close-btn" id="user-modal-close">&times;</button>
       
-      <!-- Modal Header (Dynamic) -->
+      <!-- Modal Header -->
       <h3 class="modal-title" id="user-modal-title">Foydalanuvchi Profili</h3>
-      <p class="modal-subtitle" id="user-modal-subtitle">Natijalaringiz va progressni saqlash uchun ma'lumotlaringizni kiriting:</p>
+      <p class="modal-subtitle" id="user-modal-subtitle">Natijalaringiz, XP va Sertifikatni saqlash uchun ma'lumotlaringizni kiriting:</p>
 
-      <!-- 1. Tizimga Kirmagan Holat (Logged Out View) -->
+      <!-- 1. Tizimga Kirmagan Holat (Form View) -->
       <div id="user-logged-out-view">
         <!-- Google Quick Sign-In Button -->
         <button class="btn btn-google-login" id="btn-google-login" type="button">
@@ -350,33 +350,28 @@
             <path fill="#FBBC05" d="M5.84 14.1c-.22-.66-.35-1.36-.35-2.1s.13-1.44.35-2.1V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.62z"/>
             <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
           </svg>
-          <span>Google Orqali Kirish</span>
+          <span>Google orqali avtomatik kirish</span>
         </button>
 
-        <!-- Dynamic Official Google GSI Render Target Container -->
-        <div id="g_id_onload" 
-             data-client_id="YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com" 
-             data-callback="handleGoogleCredentialResponse"
-             data-auto_prompt="false"
-             style="display: none;">
-        </div>
-        <div id="gsi-button-wrapper" style="display: none; margin-bottom: 1rem;"></div>
-
         <div class="or-divider">
-          <span>YOKI EMAIL/ISM ORQALI</span>
+          <span>YOKI TOLIQ MA'LUMOTLARNI KIRITING</span>
         </div>
 
         <form id="user-profile-form">
           <div class="form-group">
-            <label class="form-label" for="input-user-name">Ismingiz:</label>
+            <label class="form-label" for="input-user-name">Ism va Familiyangiz:</label>
             <input type="text" class="form-input" id="input-user-name" placeholder="Masalan: Jasur Aliyev" required>
           </div>
           <div class="form-group">
-            <label class="form-label" for="input-user-contact">Telefon yoki Email:</label>
-            <input type="text" class="form-input" id="input-user-contact" placeholder="+998 90 123 45 67" required>
+            <label class="form-label" for="input-user-email">Gmail (Email) manzilingiz:</label>
+            <input type="email" class="form-input" id="input-user-email" placeholder="nomingiz@gmail.com" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="input-user-phone">Telefon raqamingiz:</label>
+            <input type="tel" class="form-input" id="input-user-phone" placeholder="+998 90 123 45 67" required>
           </div>
           <button type="submit" class="btn btn-primary btn-glow" style="width: 100%; margin-top: 0.5rem;">
-            <i class="fa-solid fa-floppy-disk"></i> Saqlash va Davom etish
+            <i class="fa-solid fa-floppy-disk"></i> Saqlash va Tizimga Kirish
           </button>
         </form>
       </div>
@@ -391,9 +386,14 @@
             </div>
           </div>
           <h4 class="profile-name" id="profile-display-name">Foydalanuvchi Ismi</h4>
-          <p class="profile-contact" id="profile-display-contact">user@gmail.com</p>
+          <p class="profile-contact" id="profile-display-email">user@gmail.com</p>
+          <p class="profile-contact" id="profile-display-phone" style="font-size:0.8rem; color:var(--text-muted); margin-top:-0.75rem;">+998 90 123 45 67</p>
 
           <div class="profile-stats-grid">
+            <div class="stat-item">
+              <span class="stat-label">Tajriba ballari:</span>
+              <span class="stat-value" id="profile-stat-xp">150 XP</span>
+            </div>
             <div class="stat-item">
               <span class="stat-label">Diagnostika:</span>
               <span class="stat-value" id="profile-stat-diag">Boshlanmagan</span>

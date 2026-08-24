@@ -610,5 +610,55 @@ export const TRAINER_TASKS = [
       "=$D$1*B2",
       "=D1*B2"
     ]
+  },
+  {
+    id: 7,
+    title: "7-Vazifa: Mantiqiy Shart (IF / ЕСЛИ)",
+    targetCell: "C2",
+    instruction: "Savdo miqdori 5000 $ dan yuqori bo'lsa 'Premium', aks holda 'Standard' darajasini aniqlang. <strong>C2</strong> katakka <strong>B2 > 5000</strong> shartini tekshiruvchi formulani yozing.",
+    hint: "=ЕСЛИ(B2>5000; \"Premium\"; \"Standard\") yoki =IF(B2>5000, \"Premium\", \"Standard\")",
+    gridData: {
+      headers: ["A", "B", "C"],
+      rows: [
+        { row: 1, cells: { A: "Menejer", B: "Savdo ($)", C: "Status" } },
+        { row: 2, cells: { A: "Anvar Karimov", B: 6500, C: "" } },
+        { row: 3, cells: { A: "Sevara Aliyeva", B: 3200, C: "" } },
+        { row: 4, cells: { A: "Jasur Rahimov", B: 8100, C: "" } },
+        { row: 5, cells: { A: "Malika Soliyeva", B: 4900, C: "" } }
+      ]
+    },
+    expectedFunction: ["IF", "ЕСЛИ"],
+    expectedResult: "Premium",
+    allowedFormulas: [
+      "=ЕСЛИ(B2>5000; \"Premium\"; \"Standard\")",
+      "=IF(B2>5000, \"Premium\", \"Standard\")",
+      "=IF(B2>5000,\"Premium\",\"Standard\")"
+    ]
+  },
+  {
+    id: 8,
+    title: "8-Vazifa: Shartli Sanash (COUNTIF / СЧЁТЕСЛИ)",
+    targetCell: "B7",
+    instruction: "B2:B6 diapazonida savdosi 5000 $ dan yuqori bo'lgan filiallar sonini toping. <strong>B7</strong> katakka <strong>COUNTIF</strong> formulasini kiriting.",
+    hint: "=СЧЁТЕСЛИ(B2:B6; \">5000\") yoki =COUNTIF(B2:B6, \">5000\")",
+    gridData: {
+      headers: ["A", "B", "C"],
+      rows: [
+        { row: 1, cells: { A: "Filial", B: "Savdo ($)", C: "Kategoriya" } },
+        { row: 2, cells: { A: "Markaz", B: 7200, C: "A" } },
+        { row: 3, cells: { A: "Shimol", B: 4100, C: "B" } },
+        { row: 4, cells: { A: "Janub", B: 8900, C: "A" } },
+        { row: 5, cells: { A: "Sharq", B: 3500, C: "B" } },
+        { row: 6, cells: { A: "G'arb", B: 6300, C: "A" } },
+        { row: 7, cells: { A: "5000+ FILIALLAR SONI:", B: "", C: "" } }
+      ]
+    },
+    expectedFunction: ["COUNTIF", "СЧЁТЕСЛИ"],
+    expectedResult: 3,
+    allowedFormulas: [
+      "=СЧЁТЕСЛИ(B2:B6; \">5000\")",
+      "=COUNTIF(B2:B6, \">5000\")",
+      "=COUNTIF(B2:B6,\">5000\")"
+    ]
   }
 ];

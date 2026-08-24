@@ -27,11 +27,16 @@ class ExcelMastersApp {
   init() {
     this.bindGlobalNavigation();
     this.bindUserModal();
+    this.initGoogleAuth();
+    this.bindGoogleAuthEvents();
     this.bindHeroActions();
     this.bindDiagnosticEvents();
     this.bindCourseEvents();
     this.bindTrainerEvents();
     this.bindCongratsModal();
+    this.bindCertificateEvents();
+    this.bindLeaderboardEvents();
+    this.bindAiHelperEvents();
 
     this.updateUserUI();
     this.renderCourseSidebar();
@@ -87,22 +92,172 @@ class ExcelMastersApp {
   }
 
   // ==========================================================================
-  // Foydalanuvchi Profili va Lead Capture
+  // Foydalanuvchi Profili, Google Auth & Lead Capture
   // ==========================================================================
+  initGoogleAuth() {
+    // Global Google Identity Services Callback
+    window.handleGoogleCredentialResponse = (response) => {
+      if (response && response.credential) {
+        const payload = this.parseJwt(response.credential);
+        if (payload) {
+          this.handleGoogleSignIn({
+            name: payload.name || payload.email.split("@")[0],
+            email: payload.email,
+            avatar: payload.picture,
+            googleId: payload.sub,
+            provider: "google"
+          });
+        }
+      }
+    };
+  }
+
+  parseJwt(token) {
+    try {
+      const base64Url = token.split(".")[1];
+      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split("")
+          .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+          .join("")
+      );
+      return JSON.parse(jsonPayload);
+    } catch (e) {
+      console.error("JWT parse error", e);
+      return null;
+    }
+  }
+
+  bindGoogleAuthEvents() {
+    const googleBtn = document.getElementById("btn-google-login");
+    const googleSimModal = document.getElementById("google-sim-modal");
+    const googleSimClose = document.getElementById("google-sim-close");
+    const customGoogleSubmit = document.getElementById("btn-custom-google-submit");
+    const customGoogleEmailInput = document.getElementById("custom-google-email");
+    const logoutBtn = document.getElementById("btn-logout-user");
+    const editProfileBtn = document.getElementById("btn-edit-profile");
+
+    // Google tugmasi bosilganda simulyatsiya / hisob tanlash modalini ochish
+    if (googleBtn && googleSimModal) {
+      googleBtn.addEventListener("click", () => {
+        const userModal = document.getElementById("user-modal");
+        if (userModal) userModal.classList.remove("open");
+        googleSimModal.classList.add("open");
+        this.ui.playSound("click");
+      });
+    }
+
+    if (googleSimClose && googleSimModal) {
+      googleSimClose.addEventListener("click", () => {
+        googleSimModal.classList.remove("open");
+      });
+    }
+
+    // Tayyor Google account ro'yxatidan tanlash
+    const acctItems = document.querySelectorAll(".google-acct-item");
+    acctItems.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const name = btn.getAttribute("data-name");
+        const email = btn.getAttribute("data-email");
+        const avatar = btn.getAttribute("data-avatar");
+
+        this.handleGoogleSignIn({
+          name: name,
+          email: email,
+          avatar: avatar,
+          provider: "google"
+        });
+
+        if (googleSimModal) googleSimModal.classList.remove("open");
+      });
+    });
+
+    // Custom Google Email kiritish
+    if (customGoogleSubmit && customGoogleEmailInput) {
+      customGoogleSubmit.addEventListener("click", () => {
+        const emailVal = customGoogleEmailInput.value.trim();
+        if (emailVal && emailVal.includes("@")) {
+          const nameFromEmail = emailVal.split("@")[0].replace(/[._]/g, " ");
+          const formattedName = nameFromEmail.charAt(0).toUpperCase() + nameFromEmail.slice(1);
+          const avatarUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(emailVal)}`;
+
+          this.handleGoogleSignIn({
+            name: formattedName,
+            email: emailVal,
+            avatar: avatarUrl,
+            provider: "google"
+          });
+
+          if (googleSimModal) googleSimModal.classList.remove("open");
+        } else {
+          this.ui.showToast("Iltimos, to'g'ri email manzilini kiriting!", "error");
+        }
+      });
+    }
+
+    // Tizimdan chiqish
+    if (logoutBtn) {
+      logoutBtn.addEventListener("click", () => {
+        StorageManager.clearUser();
+        this.updateUserUI();
+        const userModal = document.getElementById("user-modal");
+        if (userModal) userModal.classList.remove("open");
+        this.ui.showToast("Tizimdan chiqdingiz.", "info");
+        this.ui.playSound("click");
+      });
+    }
+
+    // Profilni tahrirlash (Edit)
+    if (editProfileBtn) {
+      editProfileBtn.addEventListener("click", () => {
+        const loggedOutView = document.getElementById("user-logged-out-view");
+        const loggedInView = document.getElementById("user-logged-in-view");
+        if (loggedOutView && loggedInView) {
+          loggedInView.style.display = "none";
+          loggedOutView.style.display = "block";
+        }
+      });
+    }
+  }
+
+  handleGoogleSignIn(userData) {
+    const savedUser = StorageManager.setUser({
+      name: userData.name,
+      contact: userData.email,
+      email: userData.email,
+      avatar: userData.avatar,
+      provider: userData.provider || "google"
+    });
+
+    this.updateUserUI();
+    this.ui.showToast(`Google orqali kirdingiz: ${userData.name}!`, "success");
+    this.ui.playSound("success");
+
+    const userModal = document.getElementById("user-modal");
+    if (userModal) userModal.classList.remove("open");
+  }
+
   bindUserModal() {
     const profileBtn = document.getElementById("user-profile-btn");
     const modal = document.getElementById("user-modal");
     const closeBtn = document.getElementById("user-modal-close");
     const form = document.getElementById("user-profile-form");
 
+    // Modal tashqarisini bosganda yopilish (All Modals Backdrop listener)
+    document.querySelectorAll(".modal-backdrop").forEach((bd) => {
+      bd.addEventListener("click", (e) => {
+        if (e.target === bd) {
+          bd.classList.remove("open");
+        }
+      });
+    });
+
     if (profileBtn && modal) {
       profileBtn.addEventListener("click", () => {
-        const user = StorageManager.getUser();
-        if (user) {
-          document.getElementById("input-user-name").value = user.name || "";
-          document.getElementById("input-user-contact").value = user.contact || "";
-        }
+        this.updateUserUI();
         modal.classList.add("open");
+        this.ui.playSound("click");
       });
     }
 
@@ -116,14 +271,25 @@ class ExcelMastersApp {
       form.addEventListener("submit", (e) => {
         e.preventDefault();
         const name = document.getElementById("input-user-name").value.trim();
-        const contact = document.getElementById("input-user-contact").value.trim();
+        const email = document.getElementById("input-user-email").value.trim();
+        const phone = document.getElementById("input-user-phone").value.trim();
 
-        if (name && contact) {
-          StorageManager.setUser({ name, contact });
+        if (name && email && phone) {
+          const avatarUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(email)}`;
+          StorageManager.setUser({ 
+            name, 
+            email, 
+            phone, 
+            contact: email, 
+            avatar: avatarUrl, 
+            provider: "standard" 
+          });
           this.updateUserUI();
           modal.classList.remove("open");
           this.ui.showToast(`Xush kelibsiz, ${name}! Profilingiz saqlandi.`, "success");
           this.ui.playSound("success");
+        } else {
+          this.ui.showToast("Iltimos, barcha maydonlarni to'ldiring!", "error");
         }
       });
     }
@@ -134,18 +300,103 @@ class ExcelMastersApp {
     const nameEl = document.getElementById("nav-user-name");
     const avatarEl = document.getElementById("nav-user-avatar");
 
+    const loggedOutView = document.getElementById("user-logged-out-view");
+    const loggedInView = document.getElementById("user-logged-in-view");
+    const modalTitle = document.getElementById("user-modal-title");
+    const modalSubtitle = document.getElementById("user-modal-subtitle");
+
+    const xpEl = document.getElementById("nav-user-xp");
+    if (xpEl) {
+      const currentXP = user && user.xp !== undefined ? user.xp : 150;
+      xpEl.textContent = `${currentXP} XP`;
+    }
+
     if (user && user.name) {
-      nameEl.textContent = user.name.split(" ")[0];
-      const initials = user.name
-        .split(" ")
-        .map(n => n[0])
-        .join("")
-        .toUpperCase()
-        .substring(0, 2);
-      avatarEl.textContent = initials || "EM";
+      // Nav Header Update
+      const firstName = user.name.split(" ")[0];
+      nameEl.textContent = firstName;
+
+      if (user.avatar) {
+        avatarEl.innerHTML = `<img src="${user.avatar}" alt="${user.name}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`;
+      } else {
+        const initials = user.name
+          .split(" ")
+          .map((n) => n[0])
+          .join("")
+          .toUpperCase()
+          .substring(0, 2);
+        avatarEl.textContent = initials || "EM";
+      }
+
+      // User Modal Update (Logged-In View)
+      if (loggedOutView && loggedInView) {
+        loggedOutView.style.display = "none";
+        loggedInView.style.display = "block";
+      }
+
+      if (modalTitle) modalTitle.textContent = "Sizning Profilingiz";
+      if (modalSubtitle) modalSubtitle.textContent = user.provider === "google" ? "Google orqali tasdiqlangan hisob" : "Saqlangan profil ma'lumotlaringiz";
+
+      // Profile details
+      const profileName = document.getElementById("profile-display-name");
+      const profileEmail = document.getElementById("profile-display-email");
+      const profilePhone = document.getElementById("profile-display-phone");
+      const profileAvatarLarge = document.getElementById("profile-avatar-large");
+      const providerBadge = document.getElementById("profile-provider-badge");
+
+      if (profileName) profileName.textContent = user.name;
+      if (profileEmail) profileEmail.textContent = user.email || user.contact || "";
+      if (profilePhone) profilePhone.textContent = user.phone || "";
+
+      if (profileAvatarLarge) {
+        if (user.avatar) {
+          profileAvatarLarge.innerHTML = `<img src="${user.avatar}" alt="${user.name}">`;
+        } else {
+          const initials = user.name.split(" ").map(n => n[0]).join("").toUpperCase().substring(0, 2);
+          profileAvatarLarge.textContent = initials || "EM";
+        }
+      }
+
+      if (providerBadge) {
+        providerBadge.style.display = user.provider === "google" ? "flex" : "none";
+      }
+
+      // Stats Update
+      const diagRes = StorageManager.getDiagnosticResult();
+      const lessonsProg = StorageManager.getLessonsProgress();
+      const profileStatDiag = document.getElementById("profile-stat-diag");
+      const profileStatLessons = document.getElementById("profile-stat-lessons");
+      const profileStatXP = document.getElementById("profile-stat-xp");
+
+      if (profileStatXP) profileStatXP.textContent = `${user.xp || 150} XP`;
+
+      if (profileStatDiag) {
+        profileStatDiag.textContent = diagRes ? `${diagRes.levelName || "Yakunlangan"}` : "Boshlanmagan";
+      }
+      if (profileStatLessons) {
+        const count = lessonsProg && lessonsProg.completedLessonIds ? lessonsProg.completedLessonIds.length : 0;
+        profileStatLessons.textContent = `${count}/8 Tugallandi`;
+      }
     } else {
+      // Nav Header Reset
       nameEl.textContent = "Mehmon";
       avatarEl.textContent = "EM";
+
+      // Form inputs reset
+      const inputName = document.getElementById("input-user-name");
+      const inputEmail = document.getElementById("input-user-email");
+      const inputPhone = document.getElementById("input-user-phone");
+      if (inputName) inputName.value = "";
+      if (inputEmail) inputEmail.value = "";
+      if (inputPhone) inputPhone.value = "";
+
+      // User Modal Update (Logged-Out View)
+      if (loggedOutView && loggedInView) {
+        loggedOutView.style.display = "block";
+        loggedInView.style.display = "none";
+      }
+      if (modalTitle) modalTitle.textContent = "Foydalanuvchi Profili";
+      if (modalSubtitle) modalSubtitle.textContent = "Natijalaringiz va progressni saqlash uchun ma'lumotlaringizni kiriting:";
     }
   }
 
@@ -713,6 +964,176 @@ class ExcelMastersApp {
         this.ui.showToast("Pro Daraja moduli tez orada ishga tushadi!", "info");
       });
     }
+
+    const certBtn = document.getElementById("congrats-cert-btn");
+    if (certBtn) {
+      certBtn.addEventListener("click", () => {
+        modal.classList.remove("open");
+        this.openCertificateModal();
+      });
+    }
+  }
+
+  // ==========================================================================
+  // 1. Rasmiy Sertifikat Generatori
+  // ==========================================================================
+  bindCertificateEvents() {
+    const modal = document.getElementById("certificate-modal");
+    const closeBtn = document.getElementById("cert-modal-close");
+    const downloadBtn = document.getElementById("btn-download-cert-png");
+
+    if (closeBtn && modal) {
+      closeBtn.addEventListener("click", () => modal.classList.remove("open"));
+    }
+
+    if (downloadBtn) {
+      downloadBtn.addEventListener("click", () => {
+        this.ui.showToast("Sertifikat yuklanmoqda...", "info");
+        setTimeout(() => {
+          window.print();
+        }, 300);
+      });
+    }
+  }
+
+  openCertificateModal() {
+    const modal = document.getElementById("certificate-modal");
+    const user = StorageManager.getUser() || { name: "Jasur Aliyev" };
+    
+    const nameEl = document.getElementById("cert-user-fullname");
+    const dateEl = document.getElementById("cert-date-issued");
+    const serialEl = document.getElementById("cert-serial-id");
+
+    if (nameEl) nameEl.textContent = user.name || "Foydalanuvchi";
+    if (dateEl) dateEl.textContent = new Date().toLocaleDateString("ru-RU");
+    if (serialEl) serialEl.textContent = `EM-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
+
+    if (modal) modal.classList.add("open");
+    this.ui.playSound("fanfare");
+    this.ui.launchConfetti();
+  }
+
+  // ==========================================================================
+  // 2. Liderlar Jadvali (Leaderboard & XP)
+  // ==========================================================================
+  bindLeaderboardEvents() {
+    const btn = document.getElementById("nav-leaderboard-btn");
+    const modal = document.getElementById("leaderboard-modal");
+    const closeBtn = document.getElementById("leaderboard-modal-close");
+
+    if (btn && modal) {
+      btn.addEventListener("click", () => {
+        this.renderLeaderboard();
+        modal.classList.add("open");
+        this.ui.playSound("click");
+      });
+    }
+
+    if (closeBtn && modal) {
+      closeBtn.addEventListener("click", () => modal.classList.remove("open"));
+    }
+  }
+
+  renderLeaderboard() {
+    const container = document.getElementById("leaderboard-list-container");
+    if (!container) return;
+
+    const data = StorageManager.getLeaderboardData();
+    container.innerHTML = data.map((item, idx) => `
+      <div class="leaderboard-item ${item.isCurrent ? 'is-current' : ''}">
+        <div class="rank-pill rank-${idx + 1}">${idx + 1}</div>
+        ${item.avatar 
+          ? `<img src="${item.avatar}" class="acct-img-avatar" style="width:34px; height:34px;">` 
+          : `<div class="user-avatar" style="width:34px; height:34px; font-size:0.8rem;">${item.name.substring(0, 2).toUpperCase()}</div>`}
+        <div class="lb-user-info">
+          <span class="lb-user-name">${item.name} ${item.isCurrent ? '(Siz)' : ''}</span>
+          <span class="lb-user-badge"><i class="fa-solid fa-medal text-gold"></i> ${item.badge}</span>
+        </div>
+        <span class="lb-user-xp"><i class="fa-solid fa-bolt text-gold"></i> ${item.xp} XP</span>
+      </div>
+    `).join("");
+  }
+
+  // ==========================================================================
+  // 3. AI Excel Yordamchi Vidjeti
+  // ==========================================================================
+  bindAiHelperEvents() {
+    const trigger = document.getElementById("ai-helper-trigger");
+    const windowEl = document.getElementById("ai-chat-window");
+    const closeBtn = document.getElementById("ai-chat-close");
+    const sendBtn = document.getElementById("ai-chat-send-btn");
+    const inputEl = document.getElementById("ai-chat-input");
+
+    if (trigger && windowEl) {
+      trigger.addEventListener("click", () => {
+        windowEl.classList.toggle("open");
+        this.ui.playSound("click");
+      });
+    }
+
+    if (closeBtn && windowEl) {
+      closeBtn.addEventListener("click", () => windowEl.classList.remove("open"));
+    }
+
+    const handleSend = () => {
+      const q = inputEl.value.trim();
+      if (!q) return;
+      this.addAiChatMessage(q, "user");
+      inputEl.value = "";
+      setTimeout(() => {
+        this.processAiQuery(q);
+      }, 500);
+    };
+
+    if (sendBtn) sendBtn.addEventListener("click", handleSend);
+    if (inputEl) {
+      inputEl.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") handleSend();
+      });
+    }
+
+    // Quick chips
+    const chips = document.querySelectorAll(".ai-prompt-chip");
+    chips.forEach(chip => {
+      chip.addEventListener("click", () => {
+        const text = chip.getAttribute("data-prompt");
+        this.addAiChatMessage(text, "user");
+        setTimeout(() => {
+          this.processAiQuery(text);
+        }, 400);
+      });
+    });
+  }
+
+  addAiChatMessage(text, sender = "bot") {
+    const messagesEl = document.getElementById("ai-chat-messages");
+    if (!messagesEl) return;
+
+    const msgDiv = document.createElement("div");
+    msgDiv.className = `ai-msg ai-msg-${sender}`;
+    msgDiv.innerHTML = `<div class="msg-content">${text}</div>`;
+    messagesEl.appendChild(msgDiv);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  processAiQuery(query) {
+    const q = query.toLowerCase();
+    let reply = "Ushbu formula haqida batafsil ma'lumot: Excel'da barcha formulalar <code>=</code> b-n boshlanadi. Kataklar diapazonini tanlash uchun <code>:</code> (masalan <code>B2:B6</code>) ishlatiladi.";
+
+    if (q.includes("sum") || q.includes("yig'indi")) {
+      reply = "<strong>СУММ (SUM)</strong> — belgilangan kataklar yoki diapazondagi barcha sonlar yig'indisini hisoblaydi.<br><em>Sintaksis:</em> <code>=СУММ(B2:B6)</code> yoki <code>=SUM(B2:B6)</code>.";
+    } else if (q.includes("average") || q.includes("o'rtacha") || q.includes("срзнач")) {
+      reply = "<strong>СРЗНАЧ (AVERAGE)</strong> — tanlangan diapazondagi sonlarning o'rtacha arifmetik qiymatini topadi.<br><em>Sintaksis:</em> <code>=СРЗНАЧ(B2:B7)</code>.";
+    } else if (q.includes("$") || q.includes("qulflash") || q.includes("absolyut")) {
+      reply = "<strong>$ (Absolyut manzil)</strong> — formulani boshqa kataklarga nusxalaganimizda katak manzili o'zgarib ketmasligi uchun ishlatiladi.<br><em>Misol:</em> <code>$D$1</code> — ustun va qatorni qat'iy qulflaydi.";
+    } else if (q.includes("vlookup") || q.includes("впр")) {
+      reply = "<strong>ВПР (VLOOKUP)</strong> — jadvalning 1-ustunidan qidirilayotgan qiymatni topib, unga mos ustundagi ma'lumotni qaytaradi.<br><em>Sintaksis:</em> <code>=ВПР(A2; A2:C10; 2; FALSE)</code>.";
+    } else if (q.includes("if") || q.includes("если") || q.includes("shart")) {
+      reply = "<strong>ЕСЛИ (IF)</strong> — berilgan mantiqiy shartni tekshiradi. Shart bajarilsa 1-qiymatni, bajarilmasa 2-qiymatni chiqaradi.<br><em>Sintaksis:</em> <code>=ЕСЛИ(B2>5000; \"A'lo\"; \"O'rtacha\")</code>.";
+    }
+
+    this.addAiChatMessage(reply, "bot");
+    this.ui.playSound("success");
   }
 }
 

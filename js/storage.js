@@ -35,11 +35,62 @@ export class StorageManager {
       if (!updated.createdAt) {
         updated.createdAt = new Date().toISOString();
       }
+      if (updated.xp === undefined) {
+        updated.xp = 150; // Dastlabki bonus XP
+      }
       localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(updated));
       return updated;
     } catch (e) {
       console.error("User storage error", e);
       return null;
+    }
+  }
+
+  // XP qo'shish va darajani yangilash
+  static addXP(amount) {
+    const user = this.getUser();
+    if (!user) return 0;
+    const currentXP = user.xp || 0;
+    const newXP = currentXP + amount;
+    this.setUser({ xp: newXP });
+    return newXP;
+  }
+
+  // Liderlar jadvali (Mock + Joriy foydalanuvchi)
+  static getLeaderboardData() {
+    const defaultLeaderboard = [
+      { name: "Sardor Rahimov", xp: 850, badge: "Formula Ninja", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sardor" },
+      { name: "Jasur Aliyev", xp: 720, badge: "Excel Master", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Jasur" },
+      { name: "Nilufar Rahimova", xp: 640, badge: "Speed Learner", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Nilufar" },
+      { name: "Bekzod Umarov", xp: 510, badge: "Analyst", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Bekzod" }
+    ];
+
+    const currentUser = this.getUser();
+    if (currentUser && currentUser.name) {
+      const userXP = currentUser.xp || 150;
+      const existingIdx = defaultLeaderboard.findIndex(u => u.name.toLowerCase() === currentUser.name.toLowerCase());
+      if (existingIdx >= 0) {
+        defaultLeaderboard[existingIdx].xp = Math.max(defaultLeaderboard[existingIdx].xp, userXP);
+      } else {
+        defaultLeaderboard.push({
+          name: currentUser.name,
+          xp: userXP,
+          badge: currentUser.provider === "google" ? "Google Verified" : "Excel Learner",
+          avatar: currentUser.avatar || null,
+          isCurrent: true
+        });
+      }
+    }
+
+    return defaultLeaderboard.sort((a, b) => b.xp - a.xp);
+  }
+
+  // Foydalanuvchini tizimdan chiqarish / tozalash
+  static clearUser() {
+    try {
+      localStorage.removeItem(STORAGE_KEYS.USER);
+    } catch (e) {
+      console.error("Clear user error", e);
     }
   }
 

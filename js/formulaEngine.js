@@ -18,18 +18,24 @@ export class FormulaEngine {
       "СЧЁТЗ": "COUNTA", "СЧЕТЗ": "COUNTA", "COUNTA": "COUNTA",
       "МАКС": "MAX", "MAX": "MAX",
       "МИН": "MIN", "MIN": "MIN",
-      "ЕСЛИ": "IF", "IF": "IF"
+      "ЕСЛИ": "IF", "IF": "IF",
+      "СЧЁТЕСЛИ": "COUNTIF", "СЧЕТЕСЛИ": "COUNTIF", "COUNTIF": "COUNTIF",
+      "СУММЕСЛИ": "SUMIF", "SUMIF": "SUMIF",
+      "ВПР": "VLOOKUP", "VLOOKUP": "VLOOKUP"
     };
 
     // Ruscha → inglizcha chiroyli juftlik (interfeys uchun)
     this.funcDisplayNames = {
-      "SUM":    "СУММ (SUM)",
-      "AVERAGE":"СРЗНАЧ (AVERAGE)",
-      "COUNT":  "СЧЁТ (COUNT)",
-      "COUNTA": "СЧЁТЗ (COUNTA)",
-      "MAX":    "МАКС (MAX)",
-      "MIN":    "МИН (MIN)",
-      "IF":     "ЕСЛИ (IF)"
+      "SUM":      "СУММ (SUM)",
+      "AVERAGE":  "СРЗНАЧ (AVERAGE)",
+      "COUNT":    "СЧЁТ (COUNT)",
+      "COUNTA":   "СЧЁТЗ (COUNTA)",
+      "MAX":      "МАКС (MAX)",
+      "MIN":      "МИН (MIN)",
+      "IF":       "ЕСЛИ (IF)",
+      "COUNTIF":  "СЧЁТЕСЛИ (COUNTIF)",
+      "SUMIF":    "СУММЕСЛИ (SUMIF)",
+      "VLOOKUP":  "ВПР (VLOOKUP)"
     };
 
     // Keng tarqalgan noto'g'ri funksiya nomlari va ularning to'g'ri muqobillari
@@ -309,6 +315,106 @@ export class FormulaEngine {
         case "MIN": {
           const numbers = extractedValues.filter(v => typeof v === "number" && !isNaN(v));
           return { isValid: true, result: numbers.length ? Math.min(...numbers) : 0, standardFunc, extractedValues };
+        }
+        case "COUNTIF": {
+          // argTokens: [range, criteria]
+          if (argTokens.length >= 2) {
+            const rangeVals = this.getRangeValues(argTokens[0], gridRows);
+            const criteriaRaw = argTokens[1].replace(/["']/g, "").trim();
+            let count = 0;
+            rangeVals.forEach(v => {
+              if (criteriaRaw.startsWith(">")) {
+                const target = parseFloat(criteriaRaw.substring(1));
+                if (v > target) count++;
+              } else if (criteriaRaw.startsWith("<")) {
+                const target = parseFloat(criteriaRaw.substring(1));
+                if (v < target) count++;
+              } else {
+                if (String(v).toLowerCase() === criteriaRaw.toLowerCase()) count++;
+              }
+            });
+            return { isValid: true, result: count, standardFunc };
+          }
+          return { isValid: true, result: 0, standardFunc };
+        }
+        case "SUMIF": {
+          // argTokens: [range, criteria, sum_range]
+          if (argTokens.length >= 2) {
+            const rangeVals = this.getRangeValues(argTokens[0], gridRows);
+            const sumVals = argTokens[2] ? this.getRangeValues(argTokens[2], gridRows) : rangeVals;
+            const criteriaRaw = argTokens[1].replace(/["']/g, "").trim();
+            let sum = 0;
+            rangeVals.forEach((v, idx) => {
+              let match = false;
+              if (criteriaRaw.startsWith(">")) {
+                match = v > parseFloat(criteriaRaw.substring(1));
+              } else if (criteriaRaw.startsWith("<")) {
+                match = v < parseFloat(criteriaRaw.substring(1));
+              } else {
+                match = String(v).toLowerCase() === criteriaRaw.toLowerCase();
+              }
+              if (match && sumVals[idx] !== undefined) {
+                const addVal = typeof sumVals[idx] === "number" ? sumVals[idx] : parseFloat(sumVals[idx]);
+                if (!isNaN(addVal)) sum += addVal;
+              }
+            });
+            return { isValid: true, result: Math.round(sum * 100) / 100, standardFunc };
+          }
+          return { isValid: true, result: 0, standardFunc };
+        }
+        case "IF": {
+          // argTokens: [condition, val_if_true, val_if_false]
+          if (argTokens.length >= 2) {
+            const condStr = argTokens[0];
+            let isTrue = false;
+            if (condStr.includes(">")) {
+              const [left, right] = condStr.split(">");
+              isTrue = this.getCellValue(left.trim(), gridRows) > (parseFloat(right) || this.getCellValue(right.trim(), gridRows));
+            } else if (condStr.includes("<")) {
+              const [left, right] = condStr.split("<");
+              isTrue = this.getCellValue(left.trim(), gridRows) < (parseFloat(right) || this.getCellValue(right.trim(), gridRows));
+            } else if (condStr.includes("=")) {
+              const [left, right] = condStr.split("=");
+              isTrue = String(this.getCellValue(left.trim(), gridRows)) === String(right.replace(/["']/g, "").trim());
+            }
+            const resVal = isTrue ? argTokens[1] : (argTokens[2] || "0");
+            const cleanRes = resVal.replace(/["']/g, "").trim();
+            const numRes = parseFloat(cleanRes);
+            return { isValid: true, result: isNaN(numRes) ? cleanRes : numRes, standardFunc };
+          }
+          return { isValid: true, result: 0, standardFunc };
+        }
+        case "VLOOKUP": {
+          // argTokens: [lookup_val, table_range, col_index, approx]
+          if (argTokens.length >= 3) {
+            const lookupValRaw = argTokens[0].replace(/["']/g, "").trim();
+            const lookupVal = /^\$?[A-Z]\$?\d+$/i.test(lookupValRaw) ? this.getCellValue(lookupValRaw, gridRows) : lookupValRaw;
+            const colIdx = parseInt(argTokens[2], 10);
+            
+            // Extract table range
+            const rangeStr = argTokens[1].replace(/\$/g, "").toUpperCase();
+            const parts = rangeStr.split(":");
+            if (parts.length === 2 && colIdx > 0) {
+              const startMatch = parts[0].match(/^([A-Z]+)(\d+)$/);
+              const endMatch = parts[1].match(/^([A-Z]+)(\d+)$/);
+              if (startMatch && endMatch) {
+                const startColChar = startMatch[1].charCodeAt(0);
+                const startRow = parseInt(startMatch[2], 10);
+                const endRow = parseInt(endMatch[2], 10);
+                const targetColChar = startColChar + colIdx - 1;
+
+                for (let r = startRow; r <= endRow; r++) {
+                  const firstColVal = this.getCellValue(`${String.fromCharCode(startColChar)}${r}`, gridRows);
+                  if (String(firstColVal).toLowerCase() === String(lookupVal).toLowerCase()) {
+                    const resultVal = this.getCellValue(`${String.fromCharCode(targetColChar)}${r}`, gridRows);
+                    const numRes = typeof resultVal === "number" ? resultVal : parseFloat(resultVal);
+                    return { isValid: true, result: isNaN(numRes) ? resultVal : numRes, standardFunc };
+                  }
+                }
+              }
+            }
+          }
+          return { isValid: true, result: "N/A", standardFunc };
         }
       }
     }
